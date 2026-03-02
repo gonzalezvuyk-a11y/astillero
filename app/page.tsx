@@ -1,74 +1,500 @@
-'use client';
+import { existsSync, readdirSync } from 'fs';
+import path from 'path';
 
-import { useEffect } from 'react';
+const whatsappMessage =
+  'Hola, quiero cotizar una parrilla El Astillero. Tipo: ____. Medidas aprox: __ x __. Ciudad: ____. Tengo foto/plano: sí/no.';
+const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`;
 
-const html = `
-<div class="noise-overlay"></div>
-<div class="fixed inset-0 w-full h-full pointer-events-none z-0">
-<div class="absolute inset-0 bg-background-dark"></div>
-<div class="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/90"></div>
-</div>
-<header class="fixed top-8 left-0 w-full z-50 px-4 md:px-12 flex justify-between items-start pointer-events-none">
-<div class="pointer-events-auto group">
-<h2 class="text-bone text-3xl font-condensed font-bold uppercase tracking-tighter group-hover:text-primary transition-colors duration-300">El Astillero</h2>
-</div>
-<nav class="hidden md:flex bg-background-dark/80 backdrop-blur-md border border-white/10 pointer-events-auto">
-<a class="nav-item-active px-8 py-3 text-sm font-medium uppercase tracking-wide text-gray-300 border-r border-white/10 hover:bg-bone hover:text-black transition-colors duration-300 relative" href="#collection">Colección</a>
-<a class="px-8 py-3 text-sm font-medium uppercase tracking-wide text-gray-300 border-r border-white/10 hover:bg-bone hover:text-black hover:text-primary-accent transition-colors duration-300" href="#craftsmanship">Artesanía</a>
-<a class="px-8 py-3 text-sm font-medium uppercase tracking-wide text-gray-300 border-r border-white/10 hover:bg-bone hover:text-black transition-colors duration-300" href="#bespoke">Bespoke</a>
-<a class="px-8 py-3 text-sm font-medium uppercase tracking-wide text-bone hover:bg-bone hover:text-black transition-colors duration-300 flex items-center gap-2" href="#contacto">Contacto</a>
-<div class="px-4 py-3 flex items-center justify-center text-bone cursor-pointer hover:text-primary transition-colors border-l border-white/10"><span class="material-symbols-outlined">menu</span></div>
-</nav>
-<button class="md:hidden pointer-events-auto bg-bone text-black px-4 py-2 font-bold uppercase text-sm border-b-2 border-primary">Menu</button>
-</header>
-<section class="relative h-screen flex items-center justify-center overflow-hidden">
-<div class="absolute inset-0 z-0">
-<img alt="Close up of grilling steaks with charcoal embers glowing" class="w-full h-full object-cover opacity-50 scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnRrJQb5JzMl0tJ895_5PI0nWQwJ9CF0n4JDBc9TJfL-fwmTJsYzfiOvaW6T0M71NdKwEJwvY67ucwe_7_phu8wb52ElxOJX0NE64SnxDGVWLz36EeXLpHk3TNHESPXlGbRJcjKq9dAJHFkOG4nCIanzdRicf85ebZbijoTkKRi3f6JeNjtz7CK3VVkcRbnU0_Q-EXPa1q1OVib8htGkDaU7BRBd6aDXyZjZVojPBwqw0iN1cFIOr1v3ySo7UOOH1j7ddpRzGitrHf"/>
-<div class="absolute inset-0 bg-black/40"></div>
-</div>
-<div class="relative z-10 w-full px-6 md:px-12 max-w-[1600px] mx-auto flex flex-col items-start justify-end h-full pb-32">
-<div class="fade-in-slow max-w-4xl">
-<h1 class="font-condensed font-bold text-bone text-6xl md:text-8xl lg:text-9xl leading-[0.9] tracking-tighter mb-8 uppercase">El asado <br/><span class="text-white">Se respeta</span><span class="text-primary">.</span></h1>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-12 mt-12 border-t border-white/20 pt-8">
-<p class="text-gray-300 text-sm md:text-base font-normal leading-relaxed max-w-sm border-l-2 border-primary pl-4">Ingeniería de precisión en acero inoxidable 304. Diseñado para quienes entienden que el fuego es un ritual sagrado.</p>
-<div class="flex justify-start md:justify-end"><a class="btn-solid-system on-dark group" href="#collection"><span class="btn-text">Descubrir Colección</span><span class="btn-icon"><span class="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">north_east</span></span></a></div>
-</div>
-</div>
-</div>
-</section>
-<section class="py-32 bg-[#0d0d0d] relative z-10" id="collection"><div class="max-w-[1600px] mx-auto px-6 md:px-12"><div class="flex flex-col md:flex-row justify-between items-end mb-16 border-b border-white/10 pb-8"><h2 class="font-condensed font-bold text-5xl md:text-8xl text-bone uppercase leading-none tracking-tight">Colección<span class="text-primary">.</span></h2></div><div class="grid grid-cols-1 gap-12"><div class="grid grid-cols-1 md:grid-cols-2 border border-white/10 bg-surface-dark group hover:border-primary/30 transition-colors duration-500"><div class="relative overflow-hidden aspect-[4/3] md:aspect-auto h-full border-b md:border-b-0 md:border-r border-white/10"><img alt="Large built-in stainless steel grill with glass front and cabinet" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2LJV2kz12btqQuUSIkTglGslzkyVW0_Rd9JNoO0ABDK3bExQYEJ2qRqGx-TTB16ZG6hoZyEIrV6zR5uUY_-Lfww466MDZXZFkPPckhjEMsRkfncZX6K04Uk4PLKmISWmox9vddrhqHb1DdYQo3xPRgaxuUyh6P9nx_7Seqh9sxVyqSJjELrSXWyjhPEGKEur8M0MkAGf49S_1Bvowxdu4x0K7vLFR9WHAJHqKsIudbuusbj8IcW-a4sUUNvzPPeKufRWDOVrlq-N2"/></div><div class="p-8 md:p-12 flex flex-col justify-between items-start h-full"><div><div class="flex justify-between w-full mb-6"><span class="text-primary text-xs font-bold tracking-widest uppercase border border-primary/30 px-2 py-1">Signature Series</span><span class="text-bone font-mono">$ Upon Request</span></div><h3 class="font-condensed font-bold text-4xl md:text-5xl text-white mb-4 uppercase">Parrillas Empotrables</h3><p class="text-gray-400 text-sm leading-relaxed mb-8">El corazón de su cocina exterior. Diseño integrado que fusiona elegancia y potencia industrial.</p></div></div></div></div></div></section>
-<section class="py-32 bg-bone relative border-t border-black/10 z-10" id="contacto"><div class="max-w-6xl mx-auto px-6 relative z-10"><div class="grid grid-cols-1 md:grid-cols-2 gap-20"><div class="flex flex-col justify-center"><span class="text-primary text-xs font-bold tracking-[0.4em] uppercase mb-6 block">Servicio Exclusivo</span><h2 class="font-condensed font-bold text-6xl md:text-8xl text-black mb-8 uppercase leading-[0.9]">Diseño <br/>a Medida<span class="text-primary">.</span></h2><p class="text-gray-800 font-light text-lg mb-12 max-w-md">Transformamos su visión en realidad. Consultoría personalizada para proyectos residenciales de alto nivel.</p></div><div class="bg-white border border-black/10 p-8 md:p-12 relative"><form class="space-y-8"><div class="group"><label class="block text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-3" for="name">Nombre</label><input class="w-full bg-[#f5f5f5] border border-black/10 text-black placeholder-gray-500 focus:border-primary focus:ring-0 px-4 py-3 transition-colors text-sm" id="name" placeholder="Ingrese su nombre" type="text"/></div><button class="w-full btn-solid-system on-light group flex" type="button"><span class="btn-text flex-grow">Iniciar Consulta</span><span class="btn-icon"><span class="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">north_east</span></span></button></form></div></div></div></section>
-<footer class="bg-[#181818] text-bone py-24 relative overflow-hidden z-10"><div class="absolute inset-0 bg-background-dark/95"></div><div class="max-w-[1600px] mx-auto px-6 relative z-10"><div class="border-t border-white/10 pt-12 text-center md:text-left"><div class="relative inline-block w-full text-center"><h1 class="font-condensed font-bold text-[15vw] leading-[0.8] tracking-tighter text-white/5 select-none w-full relative z-10">EL ASTILLERO<span class="text-primary opacity-80">.</span></h1></div><div class="flex flex-col md:flex-row justify-between items-center mt-8 text-[10px] uppercase tracking-widest text-gray-600"><p>© 2024 El Astillero. All rights reserved.</p><p class="mt-2 md:mt-0">Designed for those who respect the fire.</p></div></div></div></footer>
-`;
+const benefits = [
+  {
+    title: 'Acero inoxidable de primera',
+    text: 'Durabilidad real + estética premium.'
+  },
+  {
+    title: 'Fabricación a medida',
+    text: 'Tu espacio manda: medidas, diseño y opciones.'
+  },
+  {
+    title: 'Instalación + garantía',
+    text: 'Entregamos funcionando, con soporte post-venta.'
+  }
+];
+
+const featuredModels = [
+  {
+    label: 'Signature Series',
+    price: '$ Upon Request',
+    title: 'Empotrables con vidrio',
+    text: 'Look arquitectónico, integrado al quincho. Diseño premium que combina presencia visual y rendimiento.',
+    features: ['Acero inox 304', 'Herrajes de precisión', 'Iluminación LED opcional'],
+    image:
+      'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80'
+  },
+  {
+    label: 'Bespoke Design',
+    price: 'Custom Quote',
+    title: 'Quinchos completos / rediseño',
+    text: 'Upgrade total del área de asado. Proyecto integral desde concepto, fabricación e instalación final.',
+    features: ['Diseño arquitectónico', 'Materiales premium', 'Integración total'],
+    image:
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1200&q=80'
+  }
+];
+
+const modelTiles = [
+  {
+    title: 'Parrillas para terraza',
+    cta: 'Ver detalles',
+    image:
+      'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=900&q=80'
+  },
+  {
+    title: 'Fogoneros',
+    cta: 'Ver detalles',
+    image:
+      'https://images.unsplash.com/photo-1470115636492-6d2b56f9146d?auto=format&fit=crop&w=900&q=80'
+  },
+  {
+    title: 'Revestimientos inox',
+    cta: 'Ver detalles',
+    image:
+      'https://images.unsplash.com/photo-1517999144091-3d9dca6d1e43?auto=format&fit=crop&w=900&q=80'
+  }
+];
+
+const detailShots = [
+  { label: 'Frontal', image: 'https://images.unsplash.com/photo-1529694157872-4e0c0f3b238b?auto=format&fit=crop&w=1400&q=80' },
+  { label: '3/4', image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1400&q=80' },
+  { label: 'Lateral', image: 'https://images.unsplash.com/photo-1514517220031-1f8f58ce56d9?auto=format&fit=crop&w=1400&q=80' },
+  { label: 'Macro manija', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1400&q=80' },
+  { label: 'Macro vidrio', image: 'https://images.unsplash.com/photo-1516684669134-de6f7c473a2a?auto=format&fit=crop&w=1400&q=80' }
+];
+
+const rasterImageExtensions = new Set(['.png', '.jpg', '.jpeg', '.webp', '.avif']);
+const allImageExtensions = new Set([...rasterImageExtensions, '.svg']);
+
+function getProductCarouselImages() {
+  const productsDir = path.join(process.cwd(), 'public', 'products');
+  if (!existsSync(productsDir)) return [];
+
+  const files = readdirSync(productsDir)
+    .filter((file) => /^capa\b/i.test(path.parse(file).name))
+    .filter((file) => allImageExtensions.has(path.extname(file).toLowerCase()))
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+
+  const rasterFiles = files.filter((file) => rasterImageExtensions.has(path.extname(file).toLowerCase()));
+  const selectedFiles = rasterFiles.length > 0 ? rasterFiles : files;
+
+  return selectedFiles.map((file) => `/products/${encodeURIComponent(file)}`);
+}
+
+const productCarouselImages = getProductCarouselImages();
+
+const steps = ['Medimos / recibimos medidas', 'Diseñamos propuesta', 'Fabricamos', 'Instalamos y entregamos'];
+
+const testimonialQuotes = [
+  '“Terminación impecable, se nota el nivel.”',
+  '“Quedó integrado perfecto al quincho.”',
+  '“Instalación prolija y materiales top.”'
+];
+
+const projectPhotos = [
+  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1543353071-10c8ba85a904?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1556910096-6f5e72db6803?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=80'
+];
 
 export default function Home() {
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries, obs) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('opacity-100', 'translate-y-0');
-            entry.target.classList.remove('opacity-0', 'translate-y-10');
-            obs.unobserve(entry.target);
-          }
-        });
-      },
-      { root: null, rootMargin: '0px', threshold: 0.1 }
-    );
-
-    const fadeElements = document.querySelectorAll('.fade-in-up');
-    fadeElements.forEach((el) => {
-      el.classList.add('transition-all', 'duration-1000', 'opacity-0', 'translate-y-10');
-      observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <main
-      className="bg-background-dark text-gray-200 font-sans antialiased overflow-x-hidden selection:bg-primary selection:text-white"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    <main className="bg-background-dark text-text-100 font-sans antialiased overflow-x-hidden selection:bg-primary selection:text-text-100">
+      <div className="noise-overlay" />
+      <div className="fixed inset-0 w-full h-full pointer-events-none z-0">
+        <div className="absolute inset-0 bg-background-dark" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/90" />
+      </div>
+
+      <header className="fixed top-8 left-0 w-full z-50 px-4 md:px-12 flex justify-between items-start pointer-events-none">
+        <a
+          href="#inicio"
+          className="pointer-events-auto text-bone text-3xl font-condensed font-bold uppercase tracking-tighter hover:text-primary transition-colors duration-300"
+        >
+          El Astillero
+        </a>
+        <nav className="hidden md:flex bg-background-dark/80 backdrop-blur-md border border-bg-300 pointer-events-auto">
+          <a
+            className="px-8 py-3 text-sm font-medium uppercase tracking-wide text-text-200 border-r border-bg-300 hover:bg-bone hover:text-bg-100 transition-colors duration-300"
+            href="#modelos"
+          >
+            Modelos
+          </a>
+          <a
+            className="px-8 py-3 text-sm font-medium uppercase tracking-wide text-text-200 border-r border-bg-300 hover:bg-bone hover:text-bg-100 transition-colors duration-300"
+            href="#detalles"
+          >
+            Detalles
+          </a>
+          <a
+            className="px-8 py-3 text-sm font-medium uppercase tracking-wide text-text-200 border-r border-bg-300 hover:bg-bone hover:text-bg-100 transition-colors duration-300"
+            href="#galeria-productos"
+          >
+            Galeria
+          </a>
+          <a
+            className="px-8 py-3 text-sm font-medium uppercase tracking-wide text-text-200 border-r border-bg-300 hover:bg-bone hover:text-bg-100 transition-colors duration-300"
+            href="#proceso"
+          >
+            Proceso
+          </a>
+          <a
+            className="px-8 py-3 text-sm font-medium uppercase tracking-wide text-bone hover:bg-bone hover:text-bg-100 transition-colors duration-300"
+            href="#contacto"
+          >
+            Contacto
+          </a>
+        </nav>
+      </header>
+
+      <section id="inicio" className="relative min-h-screen flex items-center overflow-hidden z-10">
+        <div className="absolute inset-0 z-0">
+          <img
+            alt="Parrilla premium en uso"
+            className="w-full h-full object-cover opacity-40 scale-105"
+            src="https://images.unsplash.com/photo-1529694157872-4e0c0f3b238b?auto=format&fit=crop&w=1600&q=80"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/30" />
+        </div>
+        <div className="relative z-10 w-full px-6 md:px-12 max-w-[1600px] mx-auto pt-28 md:pt-20 pb-20">
+          <div className="inline-flex text-primary text-xs font-bold tracking-[0.3em] uppercase border border-primary/30 px-3 py-2 mb-8">
+            El asado se respeta.
+          </div>
+          <h1 className="font-condensed font-bold text-bone text-5xl md:text-7xl lg:text-8xl leading-[0.92] tracking-tight max-w-5xl uppercase">
+            Parrillas premium en acero inoxidable, hechas a medida en Paraguay.
+          </h1>
+          <p className="text-text-200 text-base md:text-xl mt-8 max-w-3xl">
+            Diseño, fabricación e instalación para quinchos y terrazas con terminación impecable.
+          </p>
+          <div className="flex flex-wrap gap-4 mt-10">
+            <a href={whatsappUrl} target="_blank" rel="noreferrer" className="btn-solid-system on-dark group">
+              <span className="btn-text">Cotizar por WhatsApp</span>
+              <span className="btn-icon">
+                <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">
+                  north_east
+                </span>
+              </span>
+            </a>
+            <a href="#modelos" className="btn-solid-system on-light group">
+              <span className="btn-text">Ver modelos</span>
+              <span className="btn-icon">
+                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">
+                  arrow_forward
+                </span>
+              </span>
+            </a>
+          </div>
+          <p className="mt-8 text-sm text-text-200 border-l-2 border-primary pl-4">
+            Acero inoxidable de primera · A medida · Instalación + garantía
+          </p>
+        </div>
+      </section>
+
+      <section className="py-24 bg-bg-200 relative z-10 border-t border-bg-300">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {benefits.map((benefit) => (
+              <article
+                key={benefit.title}
+                className="border border-bg-300 bg-surface-dark p-7 hover:border-primary/40 transition-colors"
+              >
+                <h2 className="font-condensed font-bold text-3xl text-bone uppercase leading-tight">{benefit.title}</h2>
+                <p className="mt-4 text-text-200">{benefit.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="modelos" className="py-24 bg-background-dark relative z-10 border-t border-bg-300">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-12">
+          <h2 className="font-condensed font-bold text-5xl md:text-7xl text-bone uppercase tracking-tight">
+            Modelos / Soluciones<span className="text-primary">.</span>
+          </h2>
+
+          <div className="mt-12 space-y-6">
+            {featuredModels.map((model, index) => (
+              <article
+                key={model.title}
+                className={`grid grid-cols-1 md:grid-cols-2 border border-bg-300 bg-surface-dark ${
+                  index % 2 === 1 ? 'md:[&>*:first-child]:order-2' : ''
+                }`}
+              >
+                <div className="min-h-[340px]">
+                  <img src={model.image} alt={model.title} className="h-full w-full object-cover grayscale" />
+                </div>
+
+                <div className="p-8 md:p-10 flex flex-col">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="text-[11px] text-primary border border-primary/40 px-2 py-1 uppercase tracking-[0.18em] font-semibold">
+                      {model.label}
+                    </span>
+                    <span className="text-text-200 text-sm">{model.price}</span>
+                  </div>
+
+                  <h3 className="mt-6 font-condensed font-bold text-5xl leading-[0.92] uppercase text-text-100">
+                    {model.title}
+                  </h3>
+                  <p className="mt-5 text-text-200 text-lg max-w-xl">{model.text}</p>
+
+                  <div className="mt-auto pt-10 border-t border-bg-300">
+                    <ul className="space-y-2">
+                      {model.features.map((feature) => (
+                        <li key={feature} className="text-xs uppercase tracking-[0.16em] text-text-200 flex items-center gap-2">
+                          <span className="text-primary">●</span>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+            {modelTiles.map((item) => (
+              <article key={item.title} className="border border-bg-300 bg-surface-dark overflow-hidden">
+                <img src={item.image} alt={item.title} className="h-72 w-full object-cover grayscale" />
+                <div className="p-6 border-t border-bg-300">
+                  <h4 className="font-condensed text-4xl uppercase text-text-100">{item.title}</h4>
+                  <a href="#contacto" className="inline-flex mt-3 text-sm uppercase tracking-[0.16em] text-text-200 hover:text-primary transition-colors">
+                    {item.cta}
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="galeria-productos"
+        className="product-gallery-section py-20 md:py-24 relative z-10 border-t border-[#d4cfc5] border-b border-[#d4cfc5]"
+      >
+        <div className="product-gallery-vignette" />
+        <div className="product-marquee">
+          <div className="product-track">
+            {[...productCarouselImages, ...productCarouselImages].map((image, index) => (
+              <article key={`${image}-${index}`} className="product-card">
+                <div className="product-visual-wrap">
+                  <img src={image} alt="" className="h-56 md:h-64 w-full object-contain bg-transparent" />
+                </div>
+                <div className="product-reflection" />
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="detalles" className="py-24 bg-bg-200 relative z-10 border-t border-bg-300">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-12">
+          <h2 className="font-condensed font-bold text-5xl md:text-7xl text-bone uppercase tracking-tight">Detalles que se notan.</h2>
+          <p className="text-text-200 text-lg mt-5 max-w-4xl">
+            Terminaciones, herrajes y proporciones pensadas para que el quincho se vea premium incluso cuando no estás
+            asando.
+          </p>
+          <div className="mt-10 flex gap-5 overflow-x-auto pb-2">
+            {detailShots.map((shot) => (
+              <article key={shot.label} className="min-w-[85%] md:min-w-[32%] border border-bg-300 bg-surface-dark">
+                <img src={shot.image} alt={`Render ${shot.label}`} className="h-72 w-full object-cover" />
+                <div className="px-4 py-3 text-xs uppercase tracking-[0.2em] text-text-200 border-t border-bg-300">
+                  {shot.label}
+                </div>
+              </article>
+            ))}
+          </div>
+          <a href={whatsappUrl} target="_blank" rel="noreferrer" className="btn-solid-system on-dark group mt-10">
+            <span className="btn-text">Cotizar un modelo</span>
+            <span className="btn-icon">
+              <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">
+                north_east
+              </span>
+            </span>
+          </a>
+        </div>
+      </section>
+
+      <section id="proceso" className="py-24 bg-background-dark relative z-10 border-t border-bg-300">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-12">
+          <h2 className="font-condensed font-bold text-5xl md:text-7xl text-bone uppercase tracking-tight">Cómo trabajamos.</h2>
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-5">
+            {steps.map((step, index) => (
+              <article key={step} className="border border-bg-300 bg-surface-dark p-6">
+                <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">Paso {index + 1}</p>
+                <p className="mt-4 text-text-200">{step}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-24 bg-bg-200 relative z-10 border-t border-bg-300">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-12">
+          <h2 className="font-condensed font-bold text-5xl md:text-7xl text-bone uppercase tracking-tight">Proyectos reales.</h2>
+          <p className="mt-4 text-text-200 text-sm uppercase tracking-[0.2em]">+X proyectos entregados en Paraguay</p>
+          <div className="mt-10 grid grid-cols-2 md:grid-cols-3 gap-3">
+            {projectPhotos.map((photo, index) => (
+              <img
+                key={photo}
+                src={photo}
+                alt={`Proyecto real ${index + 1}`}
+                className="h-40 md:h-52 w-full object-cover border border-bg-300"
+              />
+            ))}
+          </div>
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5">
+            {testimonialQuotes.map((quote) => (
+              <blockquote key={quote} className="border border-bg-300 bg-surface-dark p-6 text-text-100 italic">
+                {quote}
+              </blockquote>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="contacto" className="py-24 bg-text-100 text-bg-100 relative z-10 border-t border-bg-300">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-start">
+            <div>
+              <p className="text-xs tracking-[0.3em] uppercase text-primary font-semibold">Servicio exclusivo</p>
+              <h2 className="mt-5 font-condensed font-bold text-[clamp(3.2rem,9vw,8rem)] uppercase leading-[0.88] tracking-tight">
+                Diseño
+                <br />
+                a medida<span className="text-primary">.</span>
+              </h2>
+              <p className="mt-8 max-w-xl text-xl leading-relaxed text-bg-200">
+                Transformamos su visión en realidad. Consultoría personalizada para proyectos residenciales de alto nivel.
+              </p>
+
+              <div className="mt-10 space-y-4 text-bg-200">
+                <p className="flex items-center gap-3 text-lg">
+                  <span className="material-symbols-outlined text-primary">check_circle</span>
+                  Envíos a todo el país
+                </p>
+                <p className="flex items-center gap-3 text-lg">
+                  <span className="material-symbols-outlined text-primary">verified</span>
+                  Garantía extendida
+                </p>
+                <p className="flex items-center gap-3 text-lg">
+                  <span className="material-symbols-outlined text-primary">construction</span>
+                  Instalación especializada
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-[#f4f2ed] border border-[#ddd9d0] p-7 md:p-10">
+              <form className="space-y-6">
+                <div>
+                  <label className="block text-xs font-semibold tracking-[0.2em] uppercase text-bg-300 mb-3">Nombre</label>
+                  <input
+                    type="text"
+                    placeholder="Ingrese su nombre"
+                    className="w-full h-14 border border-[#d4d0c8] bg-[#eceae5] px-4 text-bg-200 placeholder:text-bg-300/70 focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold tracking-[0.2em] uppercase text-bg-300 mb-3">Email</label>
+                  <input
+                    type="email"
+                    placeholder="Ingrese su email"
+                    className="w-full h-14 border border-[#d4d0c8] bg-[#eceae5] px-4 text-bg-200 placeholder:text-bg-300/70 focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold tracking-[0.2em] uppercase text-bg-300 mb-3">
+                    Detalles del proyecto
+                  </label>
+                  <textarea
+                    rows={5}
+                    placeholder="Cuéntenos sobre su proyecto"
+                    className="w-full border border-[#d4d0c8] bg-[#eceae5] px-4 py-4 text-bg-200 placeholder:text-bg-300/70 focus:outline-none focus:border-primary resize-none"
+                  />
+                </div>
+
+                <a href={whatsappUrl} target="_blank" rel="noreferrer" className="btn-solid-system on-light group w-full">
+                  <span className="btn-text flex-1">Iniciar consulta</span>
+                  <span className="btn-icon">
+                    <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">
+                      north_east
+                    </span>
+                  </span>
+                </a>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer className="relative overflow-hidden z-10 border-t border-bg-300 bg-bg-100">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-12 py-16 md:py-20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
+            <div>
+              <p className="text-xs tracking-[0.18em] uppercase text-text-200/70 font-semibold">Quick Links</p>
+              <div className="mt-6 space-y-3 text-text-100 text-3xl font-condensed uppercase leading-none">
+                <a href="#modelos" className="block hover:text-primary transition-colors">
+                  Modelos
+                </a>
+                <a href="#detalles" className="block hover:text-primary transition-colors">
+                  Detalles
+                </a>
+                <a href="#proceso" className="block hover:text-primary transition-colors">
+                  Proceso
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs tracking-[0.18em] uppercase text-text-200/70 font-semibold">Contacto</p>
+              <div className="mt-6 space-y-3 text-text-100">
+                <a href="mailto:consultas@elastillero.com" className="block text-2xl font-condensed hover:text-primary transition-colors">
+                  consultas@elastillero.com
+                </a>
+                <a href={whatsappUrl} target="_blank" rel="noreferrer" className="block text-xl text-text-200 hover:text-primary transition-colors">
+                  +595 981 000 000
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs tracking-[0.18em] uppercase text-text-200/70 font-semibold">Social</p>
+              <div className="mt-6 flex flex-wrap gap-6 text-text-200">
+                <a href="#" className="hover:text-primary transition-colors">
+                  Instagram
+                </a>
+                <a href="#" className="hover:text-primary transition-colors">
+                  Facebook
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-14 border-t border-bg-300 pt-10">
+            <h2 className="font-condensed font-bold uppercase tracking-tight leading-[0.85] text-[clamp(3.2rem,15vw,13rem)] text-text-100/10 select-none">
+              El Astillero<span className="text-primary">.</span>
+            </h2>
+            <div className="mt-5 flex flex-col md:flex-row md:items-center md:justify-between text-[11px] tracking-[0.14em] uppercase text-text-200/60 gap-2">
+              <p>© 2026 El Astillero. All rights reserved.</p>
+              <p>Designed for those who respect the fire.</p>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
   );
 }

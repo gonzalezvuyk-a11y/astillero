@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'El Astillero - Ultra Premium Grills',
-  description: 'Ingeniería de precisión en acero inoxidable 304 para espacios de fuego premium.'
+  title: 'El Astillero | Parrillas premium a medida en Paraguay',
+  description:
+    'Diseño, fabricación e instalación de parrillas premium en acero inoxidable para quinchos y terrazas.'
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
