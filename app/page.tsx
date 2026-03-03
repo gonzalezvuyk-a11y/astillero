@@ -1,5 +1,6 @@
 import { existsSync, readdirSync } from 'fs';
 import path from 'path';
+import HeroScrollBackground from './components/HeroScrollBackground';
 
 const whatsappMessage =
   'Hola, quiero cotizar una parrilla El Astillero. Tipo: ____. Medidas aprox: __ x __. Ciudad: ____. Tengo foto/plano: sí/no.';
@@ -90,6 +91,18 @@ function getProductCarouselImages() {
 
 const productCarouselImages = getProductCarouselImages();
 
+function getHeroGifFrames() {
+  const heroDir = path.join(process.cwd(), 'public', 'herogif');
+  if (!existsSync(heroDir)) return [];
+
+  return readdirSync(heroDir)
+    .filter((file) => allImageExtensions.has(path.extname(file).toLowerCase()))
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
+    .map((file) => `/herogif/${encodeURIComponent(file)}`);
+}
+
+const heroGifFrames = getHeroGifFrames();
+
 const steps = ['Medimos / recibimos medidas', 'Diseñamos propuesta', 'Fabricamos', 'Instalamos y entregamos'];
 
 const testimonialQuotes = [
@@ -138,11 +151,11 @@ const footerSparks = [
 
 export default function Home() {
   return (
-    <main className="bg-background-dark text-text-100 font-sans antialiased overflow-x-hidden selection:bg-primary selection:text-text-100">
+    <main className="bg-background-dark text-text-100 font-sans antialiased selection:bg-primary selection:text-text-100">
       <div className="noise-overlay" />
       <div className="fixed inset-0 w-full h-full pointer-events-none z-0">
         <div className="absolute inset-0 bg-background-dark" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/28 via-transparent to-black/45" />
       </div>
 
       <header className="fixed top-8 left-0 w-full z-50 px-4 md:px-12 flex justify-between items-start pointer-events-none">
@@ -186,46 +199,64 @@ export default function Home() {
         </nav>
       </header>
 
-      <section id="inicio" className="relative min-h-screen flex items-center overflow-hidden z-10">
-        <div className="absolute inset-0 z-0">
-          <img
-            alt="Parrilla premium en uso"
-            className="w-full h-full object-cover opacity-40 scale-105"
-            src="https://images.unsplash.com/photo-1529694157872-4e0c0f3b238b?auto=format&fit=crop&w=1600&q=80"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/30" />
-        </div>
-        <div className="relative z-10 w-full px-6 md:px-12 max-w-[1600px] mx-auto pt-28 md:pt-20 pb-20">
-          <div className="inline-flex text-primary text-xs font-bold tracking-[0.3em] uppercase border border-primary/30 px-3 py-2 mb-8">
-            El asado se respeta.
+      <section id="inicio" className="relative z-10">
+        <div className="relative h-[300vh]">
+          <div className="sticky top-0 h-screen overflow-hidden">
+            <div className="absolute inset-0 z-0">
+              {heroGifFrames.length > 0 ? (
+                <HeroScrollBackground
+                  frames={heroGifFrames}
+                  sectionId="inicio"
+                  className="w-full h-full opacity-[0.98]"
+                  fit="cover"
+                  zoom={1.12}
+                  anchorY={1}
+                />
+              ) : (
+                <img
+                  alt="Parrilla premium en uso"
+                  className="w-full h-full object-cover object-[50%_72%] opacity-[0.95]"
+                  src="https://images.unsplash.com/photo-1529694157872-4e0c0f3b238b?auto=format&fit=crop&w=1600&q=80"
+                />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/6 via-transparent to-black/5" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/8 via-transparent to-black/3" />
+            </div>
+            <div className="relative z-10 flex h-full items-center">
+              <div className="w-full px-6 md:px-12 max-w-[1600px] mx-auto pt-28 md:pt-20 pb-20">
+                <div className="inline-flex text-primary text-xs font-bold tracking-[0.3em] uppercase border border-primary/30 px-3 py-2 mb-8">
+                  El asado se respeta.
+                </div>
+                <h1 className="font-condensed font-bold text-bone text-5xl md:text-7xl lg:text-8xl leading-[0.92] tracking-tight max-w-5xl uppercase">
+                  Parrillas premium en acero inoxidable, hechas a medida en Paraguay.
+                </h1>
+                <p className="text-text-200 text-base md:text-xl mt-8 max-w-3xl">
+                  Diseño, fabricación e instalación para quinchos y terrazas con terminación impecable.
+                </p>
+                <div className="flex flex-wrap gap-4 mt-10">
+                  <a href={whatsappUrl} target="_blank" rel="noreferrer" className="btn-solid-system on-dark group">
+                    <span className="btn-text">Cotizar por WhatsApp</span>
+                    <span className="btn-icon">
+                      <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">
+                        north_east
+                      </span>
+                    </span>
+                  </a>
+                  <a href="#modelos" className="btn-solid-system on-light group">
+                    <span className="btn-text">Ver modelos</span>
+                    <span className="btn-icon">
+                      <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">
+                        arrow_forward
+                      </span>
+                    </span>
+                  </a>
+                </div>
+                <p className="mt-8 text-sm text-text-200 border-l-2 border-primary pl-4">
+                  Acero inoxidable de primera · A medida · Instalación + garantía
+                </p>
+              </div>
+            </div>
           </div>
-          <h1 className="font-condensed font-bold text-bone text-5xl md:text-7xl lg:text-8xl leading-[0.92] tracking-tight max-w-5xl uppercase">
-            Parrillas premium en acero inoxidable, hechas a medida en Paraguay.
-          </h1>
-          <p className="text-text-200 text-base md:text-xl mt-8 max-w-3xl">
-            Diseño, fabricación e instalación para quinchos y terrazas con terminación impecable.
-          </p>
-          <div className="flex flex-wrap gap-4 mt-10">
-            <a href={whatsappUrl} target="_blank" rel="noreferrer" className="btn-solid-system on-dark group">
-              <span className="btn-text">Cotizar por WhatsApp</span>
-              <span className="btn-icon">
-                <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">
-                  north_east
-                </span>
-              </span>
-            </a>
-            <a href="#modelos" className="btn-solid-system on-light group">
-              <span className="btn-text">Ver modelos</span>
-              <span className="btn-icon">
-                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">
-                  arrow_forward
-                </span>
-              </span>
-            </a>
-          </div>
-          <p className="mt-8 text-sm text-text-200 border-l-2 border-primary pl-4">
-            Acero inoxidable de primera · A medida · Instalación + garantía
-          </p>
         </div>
       </section>
 
