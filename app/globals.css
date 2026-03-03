@@ -214,3 +214,39 @@ body {
     height: 20px;
   }
 }
+
+.footer-sparks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.footer-spark {
+  position: absolute;
+  bottom: -12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary-200) 72%, #fff 28%);
+  opacity: 0;
+  filter: blur(0.2px) drop-shadow(0 0 10px color-mix(in srgb, var(--primary-100) 55%, transparent));
+  animation-name: spark-rise;
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes spark-rise {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.8);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.95;
+  }
+  55% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(-240px) translateX(12px) scale(1.22);
+    opacity: 0;
+  }
+}

@@ -110,6 +110,32 @@ const projectPhotos = [
   'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=80'
 ];
 
+const footerSparks = [
+  { left: '8%', delay: '0s', duration: '5.6s', size: 3 },
+  { left: '14%', delay: '1.4s', duration: '6.2s', size: 2 },
+  { left: '21%', delay: '0.8s', duration: '5.1s', size: 2 },
+  { left: '29%', delay: '2.2s', duration: '6.4s', size: 3 },
+  { left: '36%', delay: '1.1s', duration: '5.7s', size: 2 },
+  { left: '44%', delay: '2.8s', duration: '6.6s', size: 3 },
+  { left: '52%', delay: '0.4s', duration: '5.2s', size: 2 },
+  { left: '59%', delay: '1.9s', duration: '6s', size: 3 },
+  { left: '66%', delay: '2.6s', duration: '5.4s', size: 2 },
+  { left: '73%', delay: '1.2s', duration: '6.3s', size: 3 },
+  { left: '81%', delay: '2.1s', duration: '5.8s', size: 2 },
+  { left: '89%', delay: '0.9s', duration: '6.5s', size: 3 },
+  { left: '11%', delay: '0.3s', duration: '4.8s', size: 3 },
+  { left: '18%', delay: '1.7s', duration: '5.3s', size: 4 },
+  { left: '26%', delay: '2.5s', duration: '5.9s', size: 3 },
+  { left: '34%', delay: '0.6s', duration: '4.9s', size: 4 },
+  { left: '47%', delay: '1.5s', duration: '5.4s', size: 3 },
+  { left: '55%', delay: '2.3s', duration: '5.8s', size: 4 },
+  { left: '63%', delay: '0.2s', duration: '5s', size: 3 },
+  { left: '71%', delay: '1.1s', duration: '5.6s', size: 4 },
+  { left: '79%', delay: '2.4s', duration: '6s', size: 3 },
+  { left: '86%', delay: '1.8s', duration: '5.2s', size: 4 },
+  { left: '93%', delay: '0.7s', duration: '5.7s', size: 3 }
+];
+
 export default function Home() {
   return (
     <main className="bg-background-dark text-text-100 font-sans antialiased overflow-x-hidden selection:bg-primary selection:text-text-100">
@@ -442,6 +468,21 @@ export default function Home() {
       </section>
 
       <footer className="relative overflow-hidden z-10 border-t border-bg-300 bg-bg-100">
+        <div className="footer-sparks" aria-hidden="true">
+          {footerSparks.map((spark, index) => (
+            <span
+              key={`spark-${index}`}
+              className="footer-spark"
+              style={{
+                left: spark.left,
+                width: `${spark.size}px`,
+                height: `${spark.size}px`,
+                animationDelay: spark.delay,
+                animationDuration: spark.duration
+              }}
+            />
+          ))}
+        </div>
         <div className="max-w-[1600px] mx-auto px-6 md:px-12 py-16 md:py-20">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
             <div>
