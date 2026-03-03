@@ -27,6 +27,7 @@ export default function HeroScrollBackground({
   const targetProgressRef = useRef(0);
   const currentProgressRef = useRef(0);
   const mountedRef = useRef(false);
+  const introZoomRef = useRef(1.4); // Start zoomed in for the intro
 
   const safeFrames = useMemo(() => (frames.length > 0 ? frames : []), [frames]);
 
@@ -121,8 +122,12 @@ export default function HeroScrollBackground({
           ? Math.min(viewportWidth / frame.naturalWidth, viewportHeight / frame.naturalHeight)
           : Math.max(viewportWidth / frame.naturalWidth, viewportHeight / frame.naturalHeight);
 
-      const drawWidth = frame.naturalWidth * baseScale * zoom;
-      const drawHeight = frame.naturalHeight * baseScale * zoom;
+      // Interpolate intro zoom down to 1
+      introZoomRef.current = introZoomRef.current + (1 - introZoomRef.current) * 0.05;
+      const currentZoom = zoom * introZoomRef.current;
+
+      const drawWidth = frame.naturalWidth * baseScale * currentZoom;
+      const drawHeight = frame.naturalHeight * baseScale * currentZoom;
       const drawX = (viewportWidth - drawWidth) / 2;
       const drawY = (viewportHeight - drawHeight) * anchorY;
 
@@ -145,7 +150,8 @@ export default function HeroScrollBackground({
       onProgress?.(current);
 
       const maxIndex = Math.max(safeFrames.length - 1, 0);
-      const frameIndex = Math.min(maxIndex, Math.max(0, Math.floor(current * maxIndex)));
+      const sequenceProgress = Math.min(1, current * 1.5);
+      const frameIndex = Math.min(maxIndex, Math.max(0, Math.floor(sequenceProgress * maxIndex)));
       drawFrame(frameIndex);
 
       rafRef.current = requestAnimationFrame(loop);

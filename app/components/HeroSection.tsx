@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import HeroScrollBackground from './HeroScrollBackground';
 
 type HeroSectionProps = {
@@ -8,6 +8,7 @@ type HeroSectionProps = {
   whatsappUrl: string;
   sparks: Array<{
     left: string;
+    bottom?: string;
     delay: string;
     duration: string;
     size: number;
@@ -35,17 +36,18 @@ export default function HeroSection({ heroGifFrames, whatsappUrl, sparks }: Hero
     const textLayer = textLayerRef.current;
     if (!badge || !title || !swappedTitle || !ctaRow) return;
 
-    const titleSettleT = rangeProgress(progress, 0, 0.12);
-    const badgeT = rangeProgress(progress, 0.08, 0.18);
-    const ctaT = rangeProgress(progress, 0.52, 0.72);
-    const hintFadeT = rangeProgress(progress, 0.08, 0.2);
-    const titleSwapOutT = rangeProgress(progress, 0.28, 0.38);
-    const swappedTitleInT = rangeProgress(progress, 0.42, 0.56);
-    const textExitT = rangeProgress(progress, 0.6, 1.0);
+    const titleSettleT = rangeProgress(progress, 0, 0.08);
+    const badgeT = rangeProgress(progress, 0.05, 0.12);
+    const ctaT = rangeProgress(progress, 0.35, 0.48);
+    const hintFadeT = rangeProgress(progress, 0.05, 0.15);
+    const titleSwapOutT = rangeProgress(progress, 0.18, 0.26);
+    const swappedTitleInT = rangeProgress(progress, 0.3, 0.42);
+    const textExitT = rangeProgress(progress, 0.66, 1.0);
 
     const titleBaseOpacity = lerp(0.95, 1, titleSettleT);
     title.style.opacity = (titleBaseOpacity * lerp(1, 0, titleSwapOutT)).toFixed(3);
     title.style.transform = `translate3d(0, ${lerp(6, -10, titleSwapOutT).toFixed(2)}px, 0)`;
+    title.style.animation = progress > 0.02 ? 'none' : ''; // override intro animation on scroll
 
     swappedTitle.style.opacity = lerp(0, 1, swappedTitleInT).toFixed(3);
     swappedTitle.style.transform = `translate3d(0, ${lerp(12, 0, swappedTitleInT).toFixed(2)}px, 0)`;
@@ -92,17 +94,20 @@ export default function HeroSection({ heroGifFrames, whatsappUrl, sparks }: Hero
             <div className="absolute inset-0 bg-gradient-to-r from-black/12 via-transparent to-black/10" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/18 via-transparent to-black/7" />
             <div className="absolute inset-x-0 bottom-0 h-[34vh] bg-gradient-to-t from-black/34 via-black/14 to-transparent" />
-            <div className="footer-sparks z-[2]" aria-hidden="true">
+            <div className="absolute inset-0 z-[2] overflow-hidden" aria-hidden="true">
               {sparks.map((spark, index) => (
                 <span
                   key={`hero-spark-${index}`}
-                  className="footer-spark hero-spark"
+                  className="footer-spark absolute rounded-full bg-primary"
                   style={{
                     left: spark.left,
+                    bottom: spark.bottom || '-5%', // distribute vertically if possible
                     width: `${spark.size}px`,
                     height: `${spark.size}px`,
                     animationDelay: spark.delay,
-                    animationDuration: spark.duration
+                    animationDuration: spark.duration,
+                    filter: 'blur(1px)',
+                    boxShadow: '0 0 10px 2px var(--primary-100)'
                   }}
                 />
               ))}
@@ -115,7 +120,7 @@ export default function HeroSection({ heroGifFrames, whatsappUrl, sparks }: Hero
               <div className="w-full px-4 md:px-12 pt-56 md:pt-48 pb-20">
                 <div
                   ref={badgeRef}
-                  className="inline-flex text-primary text-xs font-bold tracking-[0.3em] uppercase border border-primary px-3 py-2 mb-8"
+                  className="hero-intro-anim inline-flex text-primary text-xs font-bold tracking-[0.3em] uppercase border border-primary px-3 py-2 mb-8"
                   data-reveal="up"
                   style={{ willChange: 'opacity, transform', opacity: 0, transform: 'translate3d(0, 10px, 0)' }}
                 >
@@ -124,10 +129,8 @@ export default function HeroSection({ heroGifFrames, whatsappUrl, sparks }: Hero
                 <div className="relative max-w-5xl">
                   <h1
                     ref={titleRef}
-                    className="font-condensed font-bold text-bone text-3xl md:text-5xl lg:text-6xl leading-[0.92] tracking-[0.01em] uppercase"
-                    data-reveal="up"
-                    data-reveal-delay="110"
-                    style={{ willChange: 'opacity, transform', opacity: 0.95, transform: 'translate3d(0, 6px, 0)' }}
+                    className="hero-intro-anim font-condensed font-bold text-bone text-3xl md:text-5xl lg:text-6xl leading-[0.92] tracking-[0.01em] uppercase"
+                    style={{ '--intro-delay': '150ms', willChange: 'opacity, transform', opacity: 0, transform: 'translate3d(0, 30px, 0)' } as React.CSSProperties}
                   >
                     Parrillas
                     <br />

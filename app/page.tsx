@@ -3,6 +3,8 @@ import path from 'path';
 import HeroSection from './components/HeroSection';
 import HeaderBar from './components/HeaderBar';
 import ScrollReveal from './components/ScrollReveal';
+import AstilleroFooterLogo from './components/AstilleroFooterLogo';
+import ProductGallery from './components/ProductGallery';
 
 const whatsappMessage =
   'Hola, quiero cotizar una parrilla El Astillero. Tipo: ____. Medidas aprox: __ x __. Ciudad: ____. Tengo foto/plano: sí/no.';
@@ -10,16 +12,16 @@ const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`
 
 const benefits = [
   {
-    title: 'Acero inoxidable de primera',
-    text: 'Durabilidad real + estética premium.'
+    title: 'INOX DE PRIMERA',
+    text: 'Durabilidad real. Estética premium.'
   },
   {
-    title: 'Fabricación a medida',
-    text: 'Tu espacio manda: medidas, diseño y opciones.'
+    title: 'A MEDIDA',
+    text: 'Medidas, diseño y opciones.'
   },
   {
-    title: 'Instalación + garantía',
-    text: 'Entregamos funcionando, con soporte post-venta.'
+    title: 'INSTALACIÓN + GARANTÍA',
+    text: 'Entregamos funcionando. Post-venta.'
   }
 ];
 
@@ -175,31 +177,12 @@ async function getInstagramProjectPhotos(): Promise<ProjectPhoto[]> {
   }
 }
 
-const footerSparks = [
-  { left: '8%', delay: '0s', duration: '5.6s', size: 3 },
-  { left: '14%', delay: '1.4s', duration: '6.2s', size: 2 },
-  { left: '21%', delay: '0.8s', duration: '5.1s', size: 2 },
-  { left: '29%', delay: '2.2s', duration: '6.4s', size: 3 },
-  { left: '36%', delay: '1.1s', duration: '5.7s', size: 2 },
-  { left: '44%', delay: '2.8s', duration: '6.6s', size: 3 },
-  { left: '52%', delay: '0.4s', duration: '5.2s', size: 2 },
-  { left: '59%', delay: '1.9s', duration: '6s', size: 3 },
-  { left: '66%', delay: '2.6s', duration: '5.4s', size: 2 },
-  { left: '73%', delay: '1.2s', duration: '6.3s', size: 3 },
-  { left: '81%', delay: '2.1s', duration: '5.8s', size: 2 },
-  { left: '89%', delay: '0.9s', duration: '6.5s', size: 3 },
-  { left: '11%', delay: '0.3s', duration: '4.8s', size: 3 },
-  { left: '18%', delay: '1.7s', duration: '5.3s', size: 4 },
-  { left: '26%', delay: '2.5s', duration: '5.9s', size: 3 },
-  { left: '34%', delay: '0.6s', duration: '4.9s', size: 4 },
-  { left: '47%', delay: '1.5s', duration: '5.4s', size: 3 },
-  { left: '55%', delay: '2.3s', duration: '5.8s', size: 4 },
-  { left: '63%', delay: '0.2s', duration: '5s', size: 3 },
-  { left: '71%', delay: '1.1s', duration: '5.6s', size: 4 },
-  { left: '79%', delay: '2.4s', duration: '6s', size: 3 },
-  { left: '86%', delay: '1.8s', duration: '5.2s', size: 4 },
-  { left: '93%', delay: '0.7s', duration: '5.7s', size: 3 }
-];
+const footerSparks = Array.from({ length: 18 }).map((_, i) => ({
+  left: `${Math.random() * 100}%`,
+  delay: `${(Math.random() * 3).toFixed(1)}s`,
+  duration: `${(Math.random() * 2 + 4).toFixed(1)}s`,
+  size: Math.floor(Math.random() * 3) + 2
+}));
 
 export default async function Home() {
   const projectPhotos = await getInstagramProjectPhotos();
@@ -218,22 +201,28 @@ export default async function Home() {
       <HeroSection heroGifFrames={heroGifFrames} whatsappUrl={whatsappUrl} sparks={footerSparks} />
 
       <section
-        className="next-section-overlap -mt-[100vh] py-24 bg-bg-200 relative z-20 border-t border-bg-300"
+        className="next-section-overlap -mt-[100vh] py-28 bg-bg-200 relative z-20"
         data-reveal="up"
       >
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Horizontal Band layout for benefits (no boarders, fine dividers) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-bg-300">
             {benefits.map((benefit, index) => (
               <article
                 key={benefit.title}
-                className="border border-bg-300 bg-surface-dark p-7 hover:border-primary/40 transition-colors"
+                className="py-12 md:py-8 md:px-12 flex flex-col justify-center text-center md:text-left group"
                 data-reveal="up"
-                data-reveal-delay={String(index * 110)}
+                data-reveal-delay={String(index * 150)}
               >
-                <h2 className="font-condensed font-bold text-2xl md:text-3xl text-bone uppercase leading-tight tracking-[0.01em]">
-                  {benefit.title}
-                </h2>
-                <p className="mt-4 text-text-200">{benefit.text}</p>
+                <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
+                  <span className="w-8 h-[1px] bg-primary opacity-60 group-hover:w-12 transition-all duration-500 ease-out" />
+                  <h2 className="font-condensed font-bold text-lg md:text-xl text-text-100 uppercase tracking-[0.05em] transition-colors duration-300">
+                    {benefit.title}
+                  </h2>
+                </div>
+                <p className="text-text-200 font-medium text-sm md:text-base leading-relaxed tracking-wide">
+                  {benefit.text}
+                </p>
               </article>
             ))}
           </div>
@@ -250,9 +239,8 @@ export default async function Home() {
             {featuredModels.map((model, index) => (
               <article
                 key={model.title}
-                className={`grid grid-cols-1 md:grid-cols-2 border border-bg-300 bg-surface-dark ${
-                  index % 2 === 1 ? 'md:[&>*:first-child]:order-2' : ''
-                }`}
+                className={`grid grid-cols-1 md:grid-cols-2 border border-bg-300 bg-surface-dark ${index % 2 === 1 ? 'md:[&>*:first-child]:order-2' : ''
+                  }`}
                 data-reveal={index % 2 === 1 ? 'left' : 'right'}
               >
                 <div className="min-h-[340px]">
@@ -308,25 +296,13 @@ export default async function Home() {
         </div>
       </section>
 
-      <section
-        id="galeria-productos"
-        className="product-gallery-section py-20 md:py-24 relative z-10 border-t border-[#d4cfc5] border-b border-[#d4cfc5]"
-        data-reveal="zoom"
-      >
-        <div className="product-gallery-vignette" />
-        <div className="product-marquee">
-          <div className="product-track">
-            {[...productCarouselImages, ...productCarouselImages].map((image, index) => (
-              <article key={`${image}-${index}`} className="product-card">
-                <div className="product-visual-wrap">
-                  <img src={image} alt="" className="h-56 md:h-64 w-full object-contain bg-transparent" />
-                </div>
-                <div className="product-reflection" />
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ProductGallery
+        products={productCarouselImages.map((img, i) => ({
+          title: `Modelo 0${i + 1}`,
+          image: img,
+          description: 'Acero Inoxidable Premium'
+        }))}
+      />
 
       <section id="detalles" className="py-24 bg-bg-200 relative z-10 border-t border-bg-300">
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
@@ -431,7 +407,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section id="contacto" className="py-24 bg-text-100 text-bg-100 relative z-10 border-t border-bg-300">
+      <section id="contacto" className="py-24 bg-[#ece8e0] text-background-dark relative z-10 border-t border-bg-300">
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-start">
             <div data-reveal="left">
@@ -441,7 +417,7 @@ export default async function Home() {
                 <br />
                 a medida<span className="text-primary">.</span>
               </h2>
-              <p className="mt-8 max-w-xl text-xl leading-relaxed text-bg-200">
+              <p className="mt-8 max-w-xl text-xl leading-relaxed text-background-dark/80">
                 Transformamos su visión en realidad. Consultoría personalizada para proyectos residenciales de alto nivel.
               </p>
 
@@ -492,13 +468,15 @@ export default async function Home() {
                   />
                 </div>
 
-                <a href={whatsappUrl} target="_blank" rel="noreferrer" className="btn-solid-system on-light group w-full">
-                  <span className="btn-text flex-1">Iniciar consulta</span>
-                  <span className="btn-icon">
-                    <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">
+                <a href={whatsappUrl} target="_blank" rel="noreferrer" className="flex items-stretch border-[1.5px] border-[#181a18] bg-[#181a18] hover:bg-primary hover:border-primary transition-colors duration-300 cursor-pointer text-bone group w-full">
+                  <span className="flex-1 font-condensed font-bold text-lg uppercase tracking-wide px-4 py-4 flex items-center justify-center">
+                    Iniciar consulta
+                  </span>
+                  <div className="border-l-[1.5px] border-bone/20 px-4 py-4 flex items-center justify-center transition-colors duration-300">
+                    <span className="material-symbols-outlined text-[1.2rem] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform duration-300">
                       north_east
                     </span>
-                  </span>
+                  </div>
                 </a>
               </form>
             </div>
@@ -568,12 +546,12 @@ export default async function Home() {
           </div>
 
           <div className="mt-14 border-t border-bg-300 pt-10">
-            <h2 className="font-condensed font-bold uppercase tracking-[0.01em] leading-[0.85] text-[clamp(2.8rem,12vw,10rem)] text-text-100/10 select-none">
-              El Astillero<span className="text-primary">.</span>
-            </h2>
+            <div className="w-full mb-6 relative z-10">
+              <AstilleroFooterLogo className="w-full h-auto object-contain select-none" />
+            </div>
             <div className="mt-5 flex flex-col md:flex-row md:items-center md:justify-between text-[11px] tracking-[0.14em] uppercase text-text-200/60 gap-2">
               <p>© 2026 El Astillero. All rights reserved.</p>
-              <p>Designed for those who respect the fire.</p>
+              <p>Diseñado para quienes respetan el fuego.</p>
             </div>
           </div>
         </div>

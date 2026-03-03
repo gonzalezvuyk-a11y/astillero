@@ -24,7 +24,7 @@ const config: Config = {
         'bg-300': 'var(--bg-300)'
       },
       fontFamily: {
-        sans: ['Montserrat', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'],
         condensed: ['Oswald', 'sans-serif']
       },
       boxShadow: {

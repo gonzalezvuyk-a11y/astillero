@@ -21,32 +21,36 @@ body {
   color: var(--text-100);
 }
 
-html {
-  scroll-behavior: smooth;
-}
+
 
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--bg-100);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--bg-300);
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary-100);
 }
+
 .fade-in-slow {
   animation: fadeIn 1.5s ease-out forwards;
   opacity: 0;
 }
+
 @keyframes fadeIn {
   to {
     opacity: 1;
   }
 }
+
 .cinematic-text {
   text-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
 }
@@ -102,9 +106,11 @@ html {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
 }
+
 .nav-item-active {
   position: relative;
 }
+
 .nav-item-active::after {
   content: '';
   position: absolute;
@@ -114,6 +120,7 @@ html {
   height: 2px;
   background-color: var(--primary-100);
 }
+
 .btn-solid-system {
   display: inline-flex;
   align-items: stretch;
@@ -126,18 +133,32 @@ html {
   border-radius: 0;
   transition: all 0.3s ease;
 }
+
 .btn-solid-system.on-dark {
   background-color: var(--bone);
   border-color: var(--bg-100);
   color: var(--bg-100);
 }
+
+.btn-solid-system.on-dark:hover {
+  background-color: var(--primary-100);
+  border-color: var(--primary-100);
+  color: var(--bg-100);
+}
+
 .btn-solid-system.on-dark .btn-text {
   padding: 1rem 2rem;
   border-right: 1px solid var(--bg-100);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: border-color 0.3s ease;
 }
+
+.btn-solid-system.on-dark:hover .btn-text {
+  border-right-color: var(--bg-100);
+}
+
 .btn-solid-system.on-dark .btn-icon {
   padding: 0 1.25rem;
   display: flex;
@@ -145,24 +166,43 @@ html {
   justify-content: center;
   color: var(--bg-100);
 }
+
 .btn-solid-system.on-light {
   background-color: var(--bg-100);
   border-color: var(--bg-100);
   color: var(--bone);
 }
+
+.btn-solid-system.on-light:hover {
+  background-color: var(--primary-100);
+  border-color: var(--primary-100);
+  color: var(--bg-100);
+}
+
 .btn-solid-system.on-light .btn-text {
   padding: 1rem 2rem;
   border-right: 1px solid var(--bone);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: border-color 0.3s ease;
 }
+
+.btn-solid-system.on-light:hover .btn-text {
+  border-right-color: var(--bg-100);
+}
+
 .btn-solid-system.on-light .btn-icon {
   padding: 0 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--bone);
+  transition: color 0.3s ease;
+}
+
+.btn-solid-system.on-light:hover .btn-icon {
+  color: var(--bg-100);
 }
 
 .hero-cta-compact {
@@ -178,14 +218,7 @@ html {
   padding: 0 0.95rem;
 }
 
-/* Header logo hover tint to primary orange */
-.header-logo {
-  transition: filter 0.3s ease;
-}
 
-.group:hover .header-logo {
-  filter: brightness(0) saturate(100%) invert(39%) sepia(56%) saturate(2866%) hue-rotate(344deg) brightness(95%) contrast(86%);
-}
 
 .product-marquee {
   overflow: hidden;
@@ -198,7 +231,6 @@ html {
   display: flex;
   gap: 2.25rem;
   width: max-content;
-  animation: product-scroll 56s linear infinite;
   padding: 0 2.5rem;
   align-items: flex-end;
 }
@@ -250,16 +282,19 @@ html {
   from {
     transform: translateX(0);
   }
+
   to {
     transform: translateX(calc(-50% - 0.625rem));
   }
 }
 
 @keyframes product-breathe {
+
   0%,
   100% {
     transform: translateY(0) scale(0.9);
   }
+
   50% {
     transform: translateY(-2px) scale(0.92);
   }
@@ -324,10 +359,12 @@ html {
     transform: translateY(0);
     opacity: 0.95;
   }
+
   70% {
     transform: translateY(0.68rem);
     opacity: 0.25;
   }
+
   100% {
     transform: translateY(0);
     opacity: 0.95;
@@ -337,7 +374,7 @@ html {
 /* Pinned hero stage + overlap with next section */
 .hero-stage {
   position: relative;
-  height: 300vh;
+  height: 400vh;
 }
 
 .hero-pin {
@@ -357,14 +394,34 @@ html {
     transform: translateY(0) translateX(0) scale(0.8);
     opacity: 0;
   }
+
   12% {
     opacity: 0.95;
   }
+
   55% {
     opacity: 0.55;
   }
+
   100% {
     transform: translateY(-240px) translateX(12px) scale(1.22);
     opacity: 0;
   }
+}
+
+@keyframes intro-fade-up {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.hero-intro-anim {
+  animation: intro-fade-up 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--intro-delay, 0ms);
 }
