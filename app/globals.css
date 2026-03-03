@@ -21,6 +21,10 @@ body {
   color: var(--text-100);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -46,6 +50,46 @@ body {
 .cinematic-text {
   text-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
 }
+
+.reveal-ready [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0) scale(0.985);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: transform, opacity;
+}
+
+.reveal-ready [data-reveal='left'] {
+  transform: translate3d(-30px, 0, 0);
+}
+
+.reveal-ready [data-reveal='right'] {
+  transform: translate3d(30px, 0, 0);
+}
+
+.reveal-ready [data-reveal='zoom'] {
+  transform: translate3d(0, 18px, 0) scale(0.94);
+}
+
+.reveal-ready [data-reveal].is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal-ready [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 .noise-overlay {
   position: fixed;
   top: 0;
@@ -119,6 +163,28 @@ body {
   align-items: center;
   justify-content: center;
   color: var(--bone);
+}
+
+.hero-cta-compact {
+  font-size: 0.9rem;
+  letter-spacing: 0.045em;
+}
+
+.hero-cta-compact .btn-text {
+  padding: 0.78rem 1.55rem;
+}
+
+.hero-cta-compact .btn-icon {
+  padding: 0 0.95rem;
+}
+
+/* Header logo hover tint to primary orange */
+.header-logo {
+  transition: filter 0.3s ease;
+}
+
+.group:hover .header-logo {
+  filter: brightness(0) saturate(100%) invert(39%) sepia(56%) saturate(2866%) hue-rotate(344deg) brightness(95%) contrast(86%);
 }
 
 .product-marquee {
@@ -232,6 +298,58 @@ body {
   animation-name: spark-rise;
   animation-timing-function: ease-out;
   animation-iteration-count: infinite;
+}
+
+/* Hero scroll hint mouse icon */
+.hero-scroll-mouse {
+  width: 2.35rem;
+  height: 3.45rem;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--text-200) 34%, transparent);
+  display: flex;
+  justify-content: center;
+  padding-top: 0.55rem;
+}
+
+.hero-scroll-wheel {
+  width: 0.34rem;
+  height: 0.72rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text-200) 88%, transparent);
+  animation: hero-scroll-wheel 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes hero-scroll-wheel {
+  0% {
+    transform: translateY(0);
+    opacity: 0.95;
+  }
+  70% {
+    transform: translateY(0.68rem);
+    opacity: 0.25;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0.95;
+  }
+}
+
+/* Pinned hero stage + overlap with next section */
+.hero-stage {
+  position: relative;
+  height: 300vh;
+}
+
+.hero-pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.next-section-overlap {
+  position: relative;
+  z-index: 20;
 }
 
 @keyframes spark-rise {

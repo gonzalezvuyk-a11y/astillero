@@ -9,6 +9,7 @@ type HeroScrollBackgroundProps = {
   zoom?: number;
   anchorY?: number;
   fit?: 'cover' | 'contain';
+  onProgress?: (progress: number) => void;
 };
 
 export default function HeroScrollBackground({
@@ -17,7 +18,8 @@ export default function HeroScrollBackground({
   className,
   zoom = 1.18,
   anchorY = 0.52,
-  fit = 'cover'
+  fit = 'cover',
+  onProgress
 }: HeroScrollBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const loadedFramesRef = useRef<HTMLImageElement[]>([]);
@@ -134,8 +136,13 @@ export default function HeroScrollBackground({
 
       // Apple-like smooth progress interpolation.
       const target = targetProgressRef.current;
-      const current = currentProgressRef.current + (target - currentProgressRef.current) * 0.15;
+      let current = currentProgressRef.current + (target - currentProgressRef.current) * 0.15;
+      // Snap near the end so the last frame is reached before the overlap section rises.
+      if (target >= 0.995) {
+        current = 1;
+      }
       currentProgressRef.current = current;
+      onProgress?.(current);
 
       const maxIndex = Math.max(safeFrames.length - 1, 0);
       const frameIndex = Math.min(maxIndex, Math.max(0, Math.floor(current * maxIndex)));
@@ -146,7 +153,7 @@ export default function HeroScrollBackground({
 
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [safeFrames, zoom, anchorY]);
+  }, [safeFrames, zoom, anchorY, onProgress]);
 
   if (safeFrames.length === 0) return null;
 

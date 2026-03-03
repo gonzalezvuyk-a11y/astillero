@@ -1,6 +1,8 @@
 import { existsSync, readdirSync } from 'fs';
 import path from 'path';
-import HeroScrollBackground from './components/HeroScrollBackground';
+import HeroSection from './components/HeroSection';
+import HeaderBar from './components/HeaderBar';
+import ScrollReveal from './components/ScrollReveal';
 
 const whatsappMessage =
   'Hola, quiero cotizar una parrilla El Astillero. Tipo: ____. Medidas aprox: __ x __. Ciudad: ____. Tengo foto/plano: sí/no.';
@@ -92,13 +94,13 @@ function getProductCarouselImages() {
 const productCarouselImages = getProductCarouselImages();
 
 function getHeroGifFrames() {
-  const heroDir = path.join(process.cwd(), 'public', 'herogif');
+  const heroDir = path.join(process.cwd(), 'public', 'herogif2');
   if (!existsSync(heroDir)) return [];
 
   return readdirSync(heroDir)
     .filter((file) => allImageExtensions.has(path.extname(file).toLowerCase()))
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
-    .map((file) => `/herogif/${encodeURIComponent(file)}`);
+    .map((file) => `/herogif2/${encodeURIComponent(file)}`);
 }
 
 const heroGifFrames = getHeroGifFrames();
@@ -111,7 +113,7 @@ const testimonialQuotes = [
   '“Instalación prolija y materiales top.”'
 ];
 
-const projectPhotos = [
+const fallbackProjectPhotos = [
   'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80',
   'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=900&q=80',
   'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=900&q=80',
@@ -122,6 +124,56 @@ const projectPhotos = [
   'https://images.unsplash.com/photo-1556910096-6f5e72db6803?auto=format&fit=crop&w=900&q=80',
   'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=80'
 ];
+
+type InstagramMediaItem = {
+  id: string;
+  media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM' | string;
+  media_url?: string;
+  thumbnail_url?: string;
+  permalink?: string;
+};
+
+type ProjectPhoto = {
+  src: string;
+  permalink?: string;
+};
+
+async function getInstagramProjectPhotos(): Promise<ProjectPhoto[]> {
+  const igUserId = process.env.INSTAGRAM_USER_ID;
+  const igAccessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
+
+  if (!igUserId || !igAccessToken) {
+    return fallbackProjectPhotos.map((src) => ({ src }));
+  }
+
+  try {
+    const params = new URLSearchParams({
+      fields: 'id,media_type,media_url,thumbnail_url,permalink,timestamp',
+      limit: '9',
+      access_token: igAccessToken
+    });
+
+    const response = await fetch(`https://graph.facebook.com/v23.0/${igUserId}/media?${params.toString()}`, {
+      next: { revalidate: 3600 }
+    });
+
+    if (!response.ok) {
+      return fallbackProjectPhotos.map((src) => ({ src }));
+    }
+
+    const payload = (await response.json()) as { data?: InstagramMediaItem[] };
+    const photosRaw: Array<ProjectPhoto | null> =
+      payload.data?.map((item) => {
+        const src = item.media_type === 'VIDEO' ? item.thumbnail_url : item.media_url;
+        return src ? { src, permalink: item.permalink } : null;
+      }) ?? [];
+    const photos = photosRaw.filter((item): item is ProjectPhoto => item !== null).slice(0, 9);
+
+    return photos.length > 0 ? photos : fallbackProjectPhotos.map((src) => ({ src }));
+  } catch {
+    return fallbackProjectPhotos.map((src) => ({ src }));
+  }
+}
 
 const footerSparks = [
   { left: '8%', delay: '0s', duration: '5.6s', size: 3 },
@@ -149,126 +201,38 @@ const footerSparks = [
   { left: '93%', delay: '0.7s', duration: '5.7s', size: 3 }
 ];
 
-export default function Home() {
+export default async function Home() {
+  const projectPhotos = await getInstagramProjectPhotos();
+
   return (
     <main className="bg-background-dark text-text-100 font-sans antialiased selection:bg-primary selection:text-text-100">
+      <ScrollReveal />
       <div className="noise-overlay" />
       <div className="fixed inset-0 w-full h-full pointer-events-none z-0">
         <div className="absolute inset-0 bg-background-dark" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/28 via-transparent to-black/45" />
       </div>
 
-      <header className="fixed top-8 left-0 w-full z-50 px-4 md:px-12 flex justify-between items-start pointer-events-none">
-        <a
-          href="#inicio"
-          className="pointer-events-auto text-bone text-3xl font-condensed font-bold uppercase tracking-tighter hover:text-primary transition-colors duration-300"
-        >
-          El Astillero
-        </a>
-        <nav className="hidden md:flex bg-background-dark/80 backdrop-blur-md border border-bg-300 pointer-events-auto">
-          <a
-            className="px-8 py-3 text-sm font-medium uppercase tracking-wide text-text-200 border-r border-bg-300 hover:bg-bone hover:text-bg-100 transition-colors duration-300"
-            href="#modelos"
-          >
-            Modelos
-          </a>
-          <a
-            className="px-8 py-3 text-sm font-medium uppercase tracking-wide text-text-200 border-r border-bg-300 hover:bg-bone hover:text-bg-100 transition-colors duration-300"
-            href="#detalles"
-          >
-            Detalles
-          </a>
-          <a
-            className="px-8 py-3 text-sm font-medium uppercase tracking-wide text-text-200 border-r border-bg-300 hover:bg-bone hover:text-bg-100 transition-colors duration-300"
-            href="#galeria-productos"
-          >
-            Galeria
-          </a>
-          <a
-            className="px-8 py-3 text-sm font-medium uppercase tracking-wide text-text-200 border-r border-bg-300 hover:bg-bone hover:text-bg-100 transition-colors duration-300"
-            href="#proceso"
-          >
-            Proceso
-          </a>
-          <a
-            className="px-8 py-3 text-sm font-medium uppercase tracking-wide text-bone hover:bg-bone hover:text-bg-100 transition-colors duration-300"
-            href="#contacto"
-          >
-            Contacto
-          </a>
-        </nav>
-      </header>
+      <HeaderBar />
 
-      <section id="inicio" className="relative z-10">
-        <div className="relative h-[300vh]">
-          <div className="sticky top-0 h-screen overflow-hidden">
-            <div className="absolute inset-0 z-0">
-              {heroGifFrames.length > 0 ? (
-                <HeroScrollBackground
-                  frames={heroGifFrames}
-                  sectionId="inicio"
-                  className="w-full h-full opacity-[0.98]"
-                  fit="cover"
-                  zoom={1.12}
-                  anchorY={1}
-                />
-              ) : (
-                <img
-                  alt="Parrilla premium en uso"
-                  className="w-full h-full object-cover object-[50%_72%] opacity-[0.95]"
-                  src="https://images.unsplash.com/photo-1529694157872-4e0c0f3b238b?auto=format&fit=crop&w=1600&q=80"
-                />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/6 via-transparent to-black/5" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/8 via-transparent to-black/3" />
-            </div>
-            <div className="relative z-10 flex h-full items-center">
-              <div className="w-full px-6 md:px-12 max-w-[1600px] mx-auto pt-28 md:pt-20 pb-20">
-                <div className="inline-flex text-primary text-xs font-bold tracking-[0.3em] uppercase border border-primary/30 px-3 py-2 mb-8">
-                  El asado se respeta.
-                </div>
-                <h1 className="font-condensed font-bold text-bone text-5xl md:text-7xl lg:text-8xl leading-[0.92] tracking-tight max-w-5xl uppercase">
-                  Parrillas premium en acero inoxidable, hechas a medida en Paraguay.
-                </h1>
-                <p className="text-text-200 text-base md:text-xl mt-8 max-w-3xl">
-                  Diseño, fabricación e instalación para quinchos y terrazas con terminación impecable.
-                </p>
-                <div className="flex flex-wrap gap-4 mt-10">
-                  <a href={whatsappUrl} target="_blank" rel="noreferrer" className="btn-solid-system on-dark group">
-                    <span className="btn-text">Cotizar por WhatsApp</span>
-                    <span className="btn-icon">
-                      <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">
-                        north_east
-                      </span>
-                    </span>
-                  </a>
-                  <a href="#modelos" className="btn-solid-system on-light group">
-                    <span className="btn-text">Ver modelos</span>
-                    <span className="btn-icon">
-                      <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">
-                        arrow_forward
-                      </span>
-                    </span>
-                  </a>
-                </div>
-                <p className="mt-8 text-sm text-text-200 border-l-2 border-primary pl-4">
-                  Acero inoxidable de primera · A medida · Instalación + garantía
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroSection heroGifFrames={heroGifFrames} whatsappUrl={whatsappUrl} sparks={footerSparks} />
 
-      <section className="py-24 bg-bg-200 relative z-10 border-t border-bg-300">
+      <section
+        className="next-section-overlap -mt-[100vh] py-24 bg-bg-200 relative z-20 border-t border-bg-300"
+        data-reveal="up"
+      >
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {benefits.map((benefit) => (
+            {benefits.map((benefit, index) => (
               <article
                 key={benefit.title}
                 className="border border-bg-300 bg-surface-dark p-7 hover:border-primary/40 transition-colors"
+                data-reveal="up"
+                data-reveal-delay={String(index * 110)}
               >
-                <h2 className="font-condensed font-bold text-3xl text-bone uppercase leading-tight">{benefit.title}</h2>
+                <h2 className="font-condensed font-bold text-2xl md:text-3xl text-bone uppercase leading-tight tracking-[0.01em]">
+                  {benefit.title}
+                </h2>
                 <p className="mt-4 text-text-200">{benefit.text}</p>
               </article>
             ))}
@@ -278,7 +242,7 @@ export default function Home() {
 
       <section id="modelos" className="py-24 bg-background-dark relative z-10 border-t border-bg-300">
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
-          <h2 className="font-condensed font-bold text-5xl md:text-7xl text-bone uppercase tracking-tight">
+          <h2 className="font-condensed font-bold text-4xl md:text-6xl text-bone uppercase tracking-[0.01em]" data-reveal="up">
             Modelos / Soluciones<span className="text-primary">.</span>
           </h2>
 
@@ -289,6 +253,7 @@ export default function Home() {
                 className={`grid grid-cols-1 md:grid-cols-2 border border-bg-300 bg-surface-dark ${
                   index % 2 === 1 ? 'md:[&>*:first-child]:order-2' : ''
                 }`}
+                data-reveal={index % 2 === 1 ? 'left' : 'right'}
               >
                 <div className="min-h-[340px]">
                   <img src={model.image} alt={model.title} className="h-full w-full object-cover grayscale" />
@@ -296,16 +261,16 @@ export default function Home() {
 
                 <div className="p-8 md:p-10 flex flex-col">
                   <div className="flex items-start justify-between gap-4">
-                    <span className="text-[11px] text-primary border border-primary/40 px-2 py-1 uppercase tracking-[0.18em] font-semibold">
+                    <span className="text-[11px] text-primary border border-primary px-2 py-1 uppercase tracking-[0.18em] font-semibold">
                       {model.label}
                     </span>
                     <span className="text-text-200 text-sm">{model.price}</span>
                   </div>
 
-                  <h3 className="mt-6 font-condensed font-bold text-5xl leading-[0.92] uppercase text-text-100">
+                  <h3 className="mt-6 font-condensed font-bold text-4xl md:text-5xl leading-[0.92] uppercase tracking-[0.01em] text-text-100">
                     {model.title}
                   </h3>
-                  <p className="mt-5 text-text-200 text-lg max-w-xl">{model.text}</p>
+                  <p className="mt-5 text-text-200 text-base md:text-lg max-w-xl">{model.text}</p>
 
                   <div className="mt-auto pt-10 border-t border-bg-300">
                     <ul className="space-y-2">
@@ -323,11 +288,16 @@ export default function Home() {
           </div>
 
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {modelTiles.map((item) => (
-              <article key={item.title} className="border border-bg-300 bg-surface-dark overflow-hidden">
+            {modelTiles.map((item, index) => (
+              <article
+                key={item.title}
+                className="border border-bg-300 bg-surface-dark overflow-hidden"
+                data-reveal="up"
+                data-reveal-delay={String(index * 100)}
+              >
                 <img src={item.image} alt={item.title} className="h-72 w-full object-cover grayscale" />
                 <div className="p-6 border-t border-bg-300">
-                  <h4 className="font-condensed text-4xl uppercase text-text-100">{item.title}</h4>
+                  <h4 className="font-condensed text-3xl md:text-4xl uppercase tracking-[0.01em] text-text-100">{item.title}</h4>
                   <a href="#contacto" className="inline-flex mt-3 text-sm uppercase tracking-[0.16em] text-text-200 hover:text-primary transition-colors">
                     {item.cta}
                   </a>
@@ -341,6 +311,7 @@ export default function Home() {
       <section
         id="galeria-productos"
         className="product-gallery-section py-20 md:py-24 relative z-10 border-t border-[#d4cfc5] border-b border-[#d4cfc5]"
+        data-reveal="zoom"
       >
         <div className="product-gallery-vignette" />
         <div className="product-marquee">
@@ -359,14 +330,21 @@ export default function Home() {
 
       <section id="detalles" className="py-24 bg-bg-200 relative z-10 border-t border-bg-300">
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
-          <h2 className="font-condensed font-bold text-5xl md:text-7xl text-bone uppercase tracking-tight">Detalles que se notan.</h2>
-          <p className="text-text-200 text-lg mt-5 max-w-4xl">
+          <h2 className="font-condensed font-bold text-4xl md:text-6xl text-bone uppercase tracking-[0.01em]" data-reveal="up">
+            Detalles que se notan.
+          </h2>
+          <p className="text-text-200 text-lg mt-5 max-w-4xl" data-reveal="up" data-reveal-delay="120">
             Terminaciones, herrajes y proporciones pensadas para que el quincho se vea premium incluso cuando no estás
             asando.
           </p>
           <div className="mt-10 flex gap-5 overflow-x-auto pb-2">
-            {detailShots.map((shot) => (
-              <article key={shot.label} className="min-w-[85%] md:min-w-[32%] border border-bg-300 bg-surface-dark">
+            {detailShots.map((shot, index) => (
+              <article
+                key={shot.label}
+                className="min-w-[85%] md:min-w-[32%] border border-bg-300 bg-surface-dark"
+                data-reveal="up"
+                data-reveal-delay={String(index * 90)}
+              >
                 <img src={shot.image} alt={`Render ${shot.label}`} className="h-72 w-full object-cover" />
                 <div className="px-4 py-3 text-xs uppercase tracking-[0.2em] text-text-200 border-t border-bg-300">
                   {shot.label}
@@ -387,10 +365,17 @@ export default function Home() {
 
       <section id="proceso" className="py-24 bg-background-dark relative z-10 border-t border-bg-300">
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
-          <h2 className="font-condensed font-bold text-5xl md:text-7xl text-bone uppercase tracking-tight">Cómo trabajamos.</h2>
+          <h2 className="font-condensed font-bold text-4xl md:text-6xl text-bone uppercase tracking-[0.01em]" data-reveal="up">
+            Cómo trabajamos.
+          </h2>
           <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-5">
             {steps.map((step, index) => (
-              <article key={step} className="border border-bg-300 bg-surface-dark p-6">
+              <article
+                key={step}
+                className="border border-bg-300 bg-surface-dark p-6"
+                data-reveal="up"
+                data-reveal-delay={String(index * 100)}
+              >
                 <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">Paso {index + 1}</p>
                 <p className="mt-4 text-text-200">{step}</p>
               </article>
@@ -401,21 +386,44 @@ export default function Home() {
 
       <section className="py-24 bg-bg-200 relative z-10 border-t border-bg-300">
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
-          <h2 className="font-condensed font-bold text-5xl md:text-7xl text-bone uppercase tracking-tight">Proyectos reales.</h2>
-          <p className="mt-4 text-text-200 text-sm uppercase tracking-[0.2em]">+X proyectos entregados en Paraguay</p>
+          <h2 className="font-condensed font-bold text-4xl md:text-6xl text-bone uppercase tracking-[0.01em]" data-reveal="up">
+            Proyectos reales.
+          </h2>
+          <p className="mt-4 text-text-200 text-sm uppercase tracking-[0.2em]" data-reveal="up" data-reveal-delay="100">
+            +X proyectos entregados en Paraguay
+          </p>
           <div className="mt-10 grid grid-cols-2 md:grid-cols-3 gap-3">
-            {projectPhotos.map((photo, index) => (
-              <img
-                key={photo}
-                src={photo}
-                alt={`Proyecto real ${index + 1}`}
-                className="h-40 md:h-52 w-full object-cover border border-bg-300"
-              />
-            ))}
+            {projectPhotos.map((photo, index) =>
+              photo.permalink ? (
+                <a key={`${photo.src}-${index}`} href={photo.permalink} target="_blank" rel="noreferrer" className="block">
+                  <img
+                    src={photo.src}
+                    alt={`Proyecto real ${index + 1}`}
+                    className="h-40 md:h-52 w-full object-cover border border-bg-300"
+                    data-reveal="zoom"
+                    data-reveal-delay={String((index % 3) * 80)}
+                  />
+                </a>
+              ) : (
+                <img
+                  key={`${photo.src}-${index}`}
+                  src={photo.src}
+                  alt={`Proyecto real ${index + 1}`}
+                  className="h-40 md:h-52 w-full object-cover border border-bg-300"
+                  data-reveal="zoom"
+                  data-reveal-delay={String((index % 3) * 80)}
+                />
+              )
+            )}
           </div>
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5">
-            {testimonialQuotes.map((quote) => (
-              <blockquote key={quote} className="border border-bg-300 bg-surface-dark p-6 text-text-100 italic">
+            {testimonialQuotes.map((quote, index) => (
+              <blockquote
+                key={quote}
+                className="border border-bg-300 bg-surface-dark p-6 text-text-100 italic"
+                data-reveal="up"
+                data-reveal-delay={String(index * 110)}
+              >
                 {quote}
               </blockquote>
             ))}
@@ -426,9 +434,9 @@ export default function Home() {
       <section id="contacto" className="py-24 bg-text-100 text-bg-100 relative z-10 border-t border-bg-300">
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-start">
-            <div>
+            <div data-reveal="left">
               <p className="text-xs tracking-[0.3em] uppercase text-primary font-semibold">Servicio exclusivo</p>
-              <h2 className="mt-5 font-condensed font-bold text-[clamp(3.2rem,9vw,8rem)] uppercase leading-[0.88] tracking-tight">
+              <h2 className="mt-5 font-condensed font-bold text-[clamp(2.8rem,7vw,6.6rem)] uppercase leading-[0.88] tracking-[0.01em]">
                 Diseño
                 <br />
                 a medida<span className="text-primary">.</span>
@@ -453,7 +461,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-[#f4f2ed] border border-[#ddd9d0] p-7 md:p-10">
+            <div className="bg-[#f4f2ed] border border-[#ddd9d0] p-7 md:p-10" data-reveal="right">
               <form className="space-y-6">
                 <div>
                   <label className="block text-xs font-semibold tracking-[0.2em] uppercase text-bg-300 mb-3">Nombre</label>
@@ -518,7 +526,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
             <div>
               <p className="text-xs tracking-[0.18em] uppercase text-text-200/70 font-semibold">Quick Links</p>
-              <div className="mt-6 space-y-3 text-text-100 text-3xl font-condensed uppercase leading-none">
+              <div className="mt-6 space-y-3 text-text-100 text-2xl md:text-3xl font-condensed uppercase leading-none tracking-[0.01em]">
                 <a href="#modelos" className="block hover:text-primary transition-colors">
                   Modelos
                 </a>
@@ -534,7 +542,10 @@ export default function Home() {
             <div>
               <p className="text-xs tracking-[0.18em] uppercase text-text-200/70 font-semibold">Contacto</p>
               <div className="mt-6 space-y-3 text-text-100">
-                <a href="mailto:consultas@elastillero.com" className="block text-2xl font-condensed hover:text-primary transition-colors">
+                <a
+                  href="mailto:consultas@elastillero.com"
+                  className="block text-xl md:text-2xl font-condensed tracking-[0.01em] hover:text-primary transition-colors"
+                >
                   consultas@elastillero.com
                 </a>
                 <a href={whatsappUrl} target="_blank" rel="noreferrer" className="block text-xl text-text-200 hover:text-primary transition-colors">
@@ -557,7 +568,7 @@ export default function Home() {
           </div>
 
           <div className="mt-14 border-t border-bg-300 pt-10">
-            <h2 className="font-condensed font-bold uppercase tracking-tight leading-[0.85] text-[clamp(3.2rem,15vw,13rem)] text-text-100/10 select-none">
+            <h2 className="font-condensed font-bold uppercase tracking-[0.01em] leading-[0.85] text-[clamp(2.8rem,12vw,10rem)] text-text-100/10 select-none">
               El Astillero<span className="text-primary">.</span>
             </h2>
             <div className="mt-5 flex flex-col md:flex-row md:items-center md:justify-between text-[11px] tracking-[0.14em] uppercase text-text-200/60 gap-2">
