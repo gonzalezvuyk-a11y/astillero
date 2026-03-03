@@ -41,7 +41,7 @@ export default function HeroSection({ heroGifFrames, whatsappUrl, sparks }: Hero
     const hintFadeT = rangeProgress(progress, 0.08, 0.2);
     const titleSwapOutT = rangeProgress(progress, 0.28, 0.38);
     const swappedTitleInT = rangeProgress(progress, 0.42, 0.56);
-    const textExitT = rangeProgress(progress, 0.72, 0.98);
+    const textExitT = rangeProgress(progress, 0.6, 1.0);
 
     const titleBaseOpacity = lerp(0.95, 1, titleSettleT);
     title.style.opacity = (titleBaseOpacity * lerp(1, 0, titleSwapOutT)).toFixed(3);
@@ -62,12 +62,12 @@ export default function HeroSection({ heroGifFrames, whatsappUrl, sparks }: Hero
     }
 
     if (textLayer) {
-      textLayer.style.transform = `translate3d(0, ${lerp(0, -100, textExitT).toFixed(2)}vh, 0)`;
+      textLayer.style.transform = `translate3d(0, ${lerp(0, -110, textExitT).toFixed(2)}vh, 0)`;
     }
   }, []);
 
   return (
-    <section id="inicio" className="relative z-0">
+    <section id="inicio" className="relative">
       <div className="hero-stage">
         <div className="hero-pin">
           <div className="absolute inset-0 z-0">
@@ -109,77 +109,77 @@ export default function HeroSection({ heroGifFrames, whatsappUrl, sparks }: Hero
             </div>
           </div>
         </div>
-        <div className="absolute inset-0 z-10">
-          <div ref={textLayerRef} className="sticky top-0 h-screen" style={{ willChange: 'transform' }}>
+        <div className="absolute inset-0 z-[25] pointer-events-none">
+          <div ref={textLayerRef} className="sticky top-0 h-screen pointer-events-auto" style={{ willChange: 'transform' }}>
             <div className="flex h-full items-center">
               <div className="w-full px-4 md:px-12 pt-56 md:pt-48 pb-20">
-              <div
-                ref={badgeRef}
-                className="inline-flex text-primary text-xs font-bold tracking-[0.3em] uppercase border border-primary px-3 py-2 mb-8"
-                data-reveal="up"
-                style={{ willChange: 'opacity, transform', opacity: 0, transform: 'translate3d(0, 10px, 0)' }}
-              >
-                El asado se respeta.
-              </div>
-              <div className="relative max-w-5xl">
-                <h1
-                  ref={titleRef}
-                  className="font-condensed font-bold text-bone text-3xl md:text-5xl lg:text-6xl leading-[0.92] tracking-[0.01em] uppercase"
+                <div
+                  ref={badgeRef}
+                  className="inline-flex text-primary text-xs font-bold tracking-[0.3em] uppercase border border-primary px-3 py-2 mb-8"
                   data-reveal="up"
-                  data-reveal-delay="110"
-                  style={{ willChange: 'opacity, transform', opacity: 0.95, transform: 'translate3d(0, 6px, 0)' }}
+                  style={{ willChange: 'opacity, transform', opacity: 0, transform: 'translate3d(0, 10px, 0)' }}
                 >
-                  Parrillas
-                  <br />
-                  premium
-                  <br />
-                  en acero
-                  <br />
-                  inoxidable.
-                </h1>
-                <h2
-                  ref={swappedTitleRef}
-                  className="pointer-events-none absolute inset-0 max-w-5xl font-condensed font-bold text-bone text-3xl md:text-5xl lg:text-6xl leading-[0.92] tracking-[0.01em] uppercase"
-                  style={{ willChange: 'opacity, transform', opacity: 0, transform: 'translate3d(0, 12px, 0)' }}
+                  El asado se respeta.
+                </div>
+                <div className="relative max-w-5xl">
+                  <h1
+                    ref={titleRef}
+                    className="font-condensed font-bold text-bone text-3xl md:text-5xl lg:text-6xl leading-[0.92] tracking-[0.01em] uppercase"
+                    data-reveal="up"
+                    data-reveal-delay="110"
+                    style={{ willChange: 'opacity, transform', opacity: 0.95, transform: 'translate3d(0, 6px, 0)' }}
+                  >
+                    Parrillas
+                    <br />
+                    premium
+                    <br />
+                    en acero
+                    <br />
+                    inoxidable.
+                  </h1>
+                  <h2
+                    ref={swappedTitleRef}
+                    className="pointer-events-none absolute inset-0 max-w-5xl font-condensed font-bold text-bone text-3xl md:text-5xl lg:text-6xl leading-[0.92] tracking-[0.01em] uppercase"
+                    style={{ willChange: 'opacity, transform', opacity: 0, transform: 'translate3d(0, 12px, 0)' }}
+                  >
+                    Fabricación e
+                    <br />
+                    instalación
+                    <br />
+                    para quinchos y
+                    <br />
+                    terrazas.
+                  </h2>
+                </div>
+                <div
+                  ref={ctaRowRef}
+                  className="mt-8 flex w-full flex-wrap gap-4 md:justify-end"
+                  data-reveal="up"
+                  data-reveal-delay="240"
+                  style={{
+                    willChange: 'opacity, transform',
+                    transformOrigin: 'left center',
+                    opacity: 0,
+                    transform: 'translate3d(0, 12px, 0) scale(0.98)'
+                  }}
                 >
-                  Fabricación e
-                  <br />
-                  instalación
-                  <br />
-                  para quinchos y
-                  <br />
-                  terrazas.
-                </h2>
-              </div>
-              <div
-                ref={ctaRowRef}
-                className="mt-8 flex w-full flex-wrap gap-4 md:justify-end"
-                data-reveal="up"
-                data-reveal-delay="240"
-                style={{
-                  willChange: 'opacity, transform',
-                  transformOrigin: 'left center',
-                  opacity: 0,
-                  transform: 'translate3d(0, 12px, 0) scale(0.98)'
-                }}
-              >
-                <a href={whatsappUrl} target="_blank" rel="noreferrer" className="btn-solid-system on-dark group hero-cta-compact">
-                  <span className="btn-text">Cotizar por WhatsApp</span>
-                  <span className="btn-icon">
-                    <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">
-                      north_east
+                  <a href={whatsappUrl} target="_blank" rel="noreferrer" className="btn-solid-system on-dark group hero-cta-compact">
+                    <span className="btn-text">Cotizar por WhatsApp</span>
+                    <span className="btn-icon">
+                      <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">
+                        north_east
+                      </span>
                     </span>
-                  </span>
-                </a>
-                <a href="#modelos" className="btn-solid-system on-light group hero-cta-compact">
-                  <span className="btn-text">Ver modelos</span>
-                  <span className="btn-icon">
-                    <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">
-                      arrow_forward
+                  </a>
+                  <a href="#modelos" className="btn-solid-system on-light group hero-cta-compact">
+                    <span className="btn-text">Ver modelos</span>
+                    <span className="btn-icon">
+                      <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">
+                        arrow_forward
+                      </span>
                     </span>
-                  </span>
-                </a>
-              </div>
+                  </a>
+                </div>
               </div>
             </div>
             <div className="pointer-events-none absolute inset-x-0 bottom-8 md:bottom-10 z-20">
