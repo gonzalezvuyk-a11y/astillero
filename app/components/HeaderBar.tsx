@@ -53,7 +53,7 @@ export default function HeaderBar() {
     >
       <div className="flex justify-between items-start">
         <a href="#inicio" className="pointer-events-auto inline-flex items-center group">
-          <img src="/astillero%20logo.svg" alt="El Astillero" className="header-logo h-12 md:h-[3.3rem] w-auto transition duration-300" />
+          <img src="/astillero%20logo.svg" alt="El Astillero" className="header-logo h-16 md:h-[4.5rem] w-auto transition duration-300" />
         </a>
 
         <div className="hidden md:flex pointer-events-auto relative">
