@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useRef, useState, useEffect } from 'react';
+import { useCallback, useRef } from 'react';
+import Image from 'next/image';
 import HeroScrollBackground from './HeroScrollBackground';
 
 type HeroSectionProps = {
@@ -84,10 +85,13 @@ export default function HeroSection({ heroGifFrames, whatsappUrl, sparks }: Hero
                 onProgress={handleProgress}
               />
             ) : (
-              <img
+              <Image
                 alt="Parrilla premium en uso"
                 className="w-full h-full object-cover object-[50%_72%] opacity-[0.95]"
                 src="https://images.unsplash.com/photo-1529694157872-4e0c0f3b238b?auto=format&fit=crop&w=1600&q=80"
+                fill
+                priority
+                sizes="100vw"
               />
             )}
             <div className="absolute inset-0 bg-black/25" />
@@ -159,7 +163,7 @@ export default function HeroSection({ heroGifFrames, whatsappUrl, sparks }: Hero
                   className="mt-12 flex w-full flex-wrap gap-4 justify-start"
                   style={{ willChange: 'opacity, transform', opacity: 0, transform: 'translate3d(0, 12px, 0)' }}
                 >
-                  <a href={whatsappUrl} target="_blank" rel="noreferrer" className="btn-solid-system on-dark group">
+                  <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="btn-solid-system on-dark group">
                     <span className="btn-text">Iniciar proyecto</span>
                     <span className="btn-icon">
                       <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">

@@ -21,6 +21,14 @@ body {
   color: var(--text-100);
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--primary-100);
+  outline-offset: 2px;
+}
+
 
 
 ::-webkit-scrollbar {

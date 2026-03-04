@@ -5,6 +5,7 @@ import Lenis from 'lenis';
 
 export default function SmoothScroll() {
     const lenisRef = useRef<Lenis | null>(null);
+    const rafIdRef = useRef<number | null>(null);
 
     useEffect(() => {
         const lenis = new Lenis({
@@ -18,10 +19,10 @@ export default function SmoothScroll() {
 
         const raf = (time: number) => {
             lenis.raf(time);
-            requestAnimationFrame(raf);
+            rafIdRef.current = requestAnimationFrame(raf);
         };
 
-        requestAnimationFrame(raf);
+        rafIdRef.current = requestAnimationFrame(raf);
 
         // Sync with anchor links (smooth scroll to hash targets)
         const handleClick = (e: MouseEvent) => {
@@ -43,7 +44,12 @@ export default function SmoothScroll() {
 
         return () => {
             document.removeEventListener('click', handleClick);
+            if (rafIdRef.current !== null) {
+                cancelAnimationFrame(rafIdRef.current);
+                rafIdRef.current = null;
+            }
             lenis.destroy();
+            lenisRef.current = null;
         };
     }, []);
 

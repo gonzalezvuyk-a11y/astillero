@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+import Image from 'next/image';
 
 if (typeof window !== 'undefined') {
     gsap.registerPlugin(ScrollTrigger);
@@ -71,9 +72,12 @@ export default function ProductGallery({ products }: ProductGalleryProps) {
                         <article key={i} className="group relative flex flex-col w-[75vw] md:w-[32vw] lg:w-[26vw] xl:w-[23vw] bg-[#f4f2ed] border-[1.5px] border-[#dcd7cd] shadow-sm transition-transform duration-500 ease-out hover:-translate-y-2 shrink-0">
                             {/* Image Container */}
                             <div className="flex-1 w-full aspect-[4/5] sm:aspect-square flex items-center justify-center p-6 md:p-10 overflow-hidden">
-                                <img
+                                <Image
                                     src={product.image}
                                     alt={product.title}
+                                    width={960}
+                                    height={960}
+                                    sizes="(max-width: 768px) 75vw, (max-width: 1280px) 32vw, 26vw"
                                     className="w-full h-full object-contain filter drop-shadow-xl transition-transform duration-700 ease-out group-hover:scale-105"
                                 />
                             </div>

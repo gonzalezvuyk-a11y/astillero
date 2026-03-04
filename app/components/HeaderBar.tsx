@@ -22,12 +22,13 @@ export default function HeaderBar() {
     setIsMounted(true);
     lastYRef.current = window.scrollY;
     let ticking = false;
+    let frameId = 0;
 
     const onScroll = () => {
       if (ticking) return;
       ticking = true;
 
-      requestAnimationFrame(() => {
+      frameId = requestAnimationFrame(() => {
         const currentY = window.scrollY;
         const delta = currentY - lastYRef.current;
 
@@ -46,7 +47,12 @@ export default function HeaderBar() {
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (frameId) {
+        cancelAnimationFrame(frameId);
+      }
+    };
   }, []);
 
   return (
@@ -75,7 +81,7 @@ export default function HeaderBar() {
               : 'opacity-0 translate-x-12 pointer-events-none'
               }`}
           >
-            <nav className="flex h-full border border-[#2a2a2a] bg-[#ece9e3] text-[#1f1f1f] whitespace-nowrap">
+            <nav id="main-menu-nav" className="flex h-full border border-[#2a2a2a] bg-[#ece9e3] text-[#1f1f1f] whitespace-nowrap">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
@@ -98,6 +104,8 @@ export default function HeaderBar() {
               : 'bg-[#ece9e3] text-[#1f1f1f] hover:bg-primary hover:text-[#181818]'
               }`}
             aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={isMenuOpen}
+            aria-controls="main-menu-nav"
           >
             {/* Animated Icon Wrapper inside button */}
             <span className="relative w-8 h-4 flex items-center justify-center">
@@ -107,7 +115,7 @@ export default function HeaderBar() {
                 <span className="block h-[2px] w-6 bg-current" />
               </span>
               {/* Close (X) Icon */}
-              <span className={`absolute material-symbols-outlined text-[1.2rem] transition-all duration-300 ${isMenuOpen ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-50 -rotate-90'}`}>
+              <span aria-hidden="true" className={`absolute material-symbols-outlined text-[1.2rem] transition-all duration-300 ${isMenuOpen ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-50 -rotate-90'}`}>
                 close
               </span>
             </span>

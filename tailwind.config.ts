@@ -24,8 +24,8 @@ const config: Config = {
         'bg-300': 'var(--bg-300)'
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        condensed: ['Oswald', 'sans-serif']
+        sans: ['var(--font-inter)', 'sans-serif'],
+        condensed: ['var(--font-oswald)', 'sans-serif']
       },
       boxShadow: {
         glow: '0 0 30px -10px color-mix(in srgb, var(--primary-100) 38%, transparent)'

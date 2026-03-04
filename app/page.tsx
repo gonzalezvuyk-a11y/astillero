@@ -1,5 +1,6 @@
 import { existsSync, readdirSync } from 'fs';
 import path from 'path';
+import Image from 'next/image';
 import HeroSection from './components/HeroSection';
 import HeaderBar from './components/HeaderBar';
 import ScrollReveal from './components/ScrollReveal';
@@ -243,8 +244,14 @@ export default async function Home() {
                   }`}
                 data-reveal={index % 2 === 1 ? 'left' : 'right'}
               >
-                <div className="min-h-[340px]">
-                  <img src={model.image} alt={model.title} className="h-full w-full object-cover grayscale" />
+                <div className="relative min-h-[340px]">
+                  <Image
+                    src={model.image}
+                    alt={model.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="h-full w-full object-cover grayscale"
+                  />
                 </div>
 
                 <div className="p-8 md:p-10 flex flex-col">
@@ -283,7 +290,14 @@ export default async function Home() {
                 data-reveal="up"
                 data-reveal-delay={String(index * 100)}
               >
-                <img src={item.image} alt={item.title} className="h-72 w-full object-cover grayscale" />
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  width={900}
+                  height={600}
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="h-72 w-full object-cover grayscale"
+                />
                 <div className="p-6 border-t border-bg-300">
                   <h4 className="font-condensed text-3xl md:text-4xl uppercase tracking-[0.01em] text-text-100">{item.title}</h4>
                   <a href="#contacto" className="inline-flex mt-3 text-sm uppercase tracking-[0.16em] text-text-200 hover:text-primary transition-colors">
@@ -321,14 +335,21 @@ export default async function Home() {
                 data-reveal="up"
                 data-reveal-delay={String(index * 90)}
               >
-                <img src={shot.image} alt={`Render ${shot.label}`} className="h-72 w-full object-cover" />
+                <Image
+                  src={shot.image}
+                  alt={`Render ${shot.label}`}
+                  width={1400}
+                  height={900}
+                  sizes="(max-width: 768px) 85vw, 32vw"
+                  className="h-72 w-full object-cover"
+                />
                 <div className="px-4 py-3 text-xs uppercase tracking-[0.2em] text-text-200 border-t border-bg-300">
                   {shot.label}
                 </div>
               </article>
             ))}
           </div>
-          <a href={whatsappUrl} target="_blank" rel="noreferrer" className="btn-solid-system on-dark group mt-10">
+          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="btn-solid-system on-dark group mt-10">
             <span className="btn-text">Cotizar un modelo</span>
             <span className="btn-icon">
               <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">
@@ -371,20 +392,28 @@ export default async function Home() {
           <div className="mt-10 grid grid-cols-2 md:grid-cols-3 gap-3">
             {projectPhotos.map((photo, index) =>
               photo.permalink ? (
-                <a key={`${photo.src}-${index}`} href={photo.permalink} target="_blank" rel="noreferrer" className="block">
-                  <img
+                <a key={`${photo.src}-${index}`} href={photo.permalink} target="_blank" rel="noopener noreferrer" className="block">
+                  <Image
                     src={photo.src}
                     alt={`Proyecto real ${index + 1}`}
+                    width={900}
+                    height={700}
+                    sizes="(max-width: 768px) 50vw, 33vw"
+                    unoptimized
                     className="h-40 md:h-52 w-full object-cover border border-bg-300"
                     data-reveal="zoom"
                     data-reveal-delay={String((index % 3) * 80)}
                   />
                 </a>
               ) : (
-                <img
+                <Image
                   key={`${photo.src}-${index}`}
                   src={photo.src}
                   alt={`Proyecto real ${index + 1}`}
+                  width={900}
+                  height={700}
+                  sizes="(max-width: 768px) 50vw, 33vw"
+                  unoptimized
                   className="h-40 md:h-52 w-full object-cover border border-bg-300"
                   data-reveal="zoom"
                   data-reveal-delay={String((index % 3) * 80)}
@@ -440,35 +469,47 @@ export default async function Home() {
             <div className="bg-[#f4f2ed] border border-[#ddd9d0] p-7 md:p-10" data-reveal="right">
               <form className="space-y-6">
                 <div>
-                  <label className="block text-xs font-semibold tracking-[0.2em] uppercase text-bg-300 mb-3">Nombre</label>
+                  <label htmlFor="contact-name" className="block text-xs font-semibold tracking-[0.2em] uppercase text-bg-300 mb-3">
+                    Nombre
+                  </label>
                   <input
+                    id="contact-name"
+                    name="name"
                     type="text"
+                    autoComplete="name"
                     placeholder="Ingrese su nombre"
-                    className="w-full h-14 border border-[#d4d0c8] bg-[#eceae5] px-4 text-bg-200 placeholder:text-bg-300/70 focus:outline-none focus:border-primary"
+                    className="w-full h-14 border border-[#d4d0c8] bg-[#eceae5] px-4 text-bg-200 placeholder:text-bg-300/70 focus:outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#eceae5]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold tracking-[0.2em] uppercase text-bg-300 mb-3">Email</label>
+                  <label htmlFor="contact-email" className="block text-xs font-semibold tracking-[0.2em] uppercase text-bg-300 mb-3">
+                    Email
+                  </label>
                   <input
+                    id="contact-email"
+                    name="email"
                     type="email"
+                    autoComplete="email"
                     placeholder="Ingrese su email"
-                    className="w-full h-14 border border-[#d4d0c8] bg-[#eceae5] px-4 text-bg-200 placeholder:text-bg-300/70 focus:outline-none focus:border-primary"
+                    className="w-full h-14 border border-[#d4d0c8] bg-[#eceae5] px-4 text-bg-200 placeholder:text-bg-300/70 focus:outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#eceae5]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold tracking-[0.2em] uppercase text-bg-300 mb-3">
+                  <label htmlFor="contact-details" className="block text-xs font-semibold tracking-[0.2em] uppercase text-bg-300 mb-3">
                     Detalles del proyecto
                   </label>
                   <textarea
+                    id="contact-details"
+                    name="details"
                     rows={5}
                     placeholder="Cuéntenos sobre su proyecto"
-                    className="w-full border border-[#d4d0c8] bg-[#eceae5] px-4 py-4 text-bg-200 placeholder:text-bg-300/70 focus:outline-none focus:border-primary resize-none"
+                    className="w-full border border-[#d4d0c8] bg-[#eceae5] px-4 py-4 text-bg-200 placeholder:text-bg-300/70 focus:outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#eceae5] resize-none"
                   />
                 </div>
 
-                <a href={whatsappUrl} target="_blank" rel="noreferrer" className="flex items-stretch border-[1.5px] border-[#181a18] bg-[#181a18] hover:bg-primary hover:border-primary transition-colors duration-300 cursor-pointer text-bone group w-full">
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex items-stretch border-[1.5px] border-[#181a18] bg-[#181a18] hover:bg-primary hover:border-primary transition-colors duration-300 cursor-pointer text-bone group w-full">
                   <span className="flex-1 font-condensed font-bold text-lg uppercase tracking-wide px-4 py-4 flex items-center justify-center">
                     Iniciar consulta
                   </span>
@@ -526,7 +567,7 @@ export default async function Home() {
                 >
                   consultas@elastillero.com
                 </a>
-                <a href={whatsappUrl} target="_blank" rel="noreferrer" className="block text-xl text-text-200 hover:text-primary transition-colors">
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="block text-xl text-text-200 hover:text-primary transition-colors">
                   +595 981 000 000
                 </a>
               </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 export type DetailItem = {
     id: string;
@@ -16,19 +17,22 @@ interface DetailExplorerProps {
 
 export default function DetailExplorer({ details, whatsappUrl }: DetailExplorerProps) {
     const [activeIndex, setActiveIndex] = useState(0);
-    const activeDetail = details[activeIndex];
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-bg-300 bg-surface-dark overflow-hidden mt-10">
             {/* Left Column: Image Viewer */}
             <div className="relative w-full aspect-[4/3] lg:aspect-auto lg:h-[600px] border-b lg:border-b-0 lg:border-r border-bg-300 bg-[#111111] overflow-hidden">
                 {details.map((detail, index) => (
-                    <img
+                    <Image
                         key={detail.id}
                         src={detail.imageSrc}
                         alt={detail.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                        unoptimized
                         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out ${index === activeIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
                             }`}
+                        priority={index === 0}
                         onError={(e) => {
                             // Simple fallback if image fails to load
                             e.currentTarget.style.display = 'none';
@@ -79,7 +83,7 @@ export default function DetailExplorer({ details, whatsappUrl }: DetailExplorerP
                     <a
                         href={whatsappUrl}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                         className="flex items-stretch border-[1.5px] border-[#dcd7cd] bg-[#f4f2ed] hover:border-primary transition-colors duration-300 cursor-pointer text-[#181a18] hover:text-primary group w-full max-w-sm"
                     >
                         <span className="flex-1 font-condensed font-bold text-lg uppercase tracking-wide px-4 py-3 flex items-center justify-center transition-colors duration-300">
