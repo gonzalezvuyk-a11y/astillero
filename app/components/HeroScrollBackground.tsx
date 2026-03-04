@@ -14,6 +14,7 @@ type HeroScrollBackgroundProps = {
 };
 
 const EAGER_FRAME_COUNT = 6;
+const BACKGROUND_CONCURRENCY = 8;
 
 export default function HeroScrollBackground({
   frames,
@@ -91,9 +92,21 @@ export default function HeroScrollBackground({
       void loadFrame(safeFrames[index], index, 'high');
     }
 
-    const loadRemainingFrames = async () => {
-      for (let index = eagerCount; index < safeFrames.length && !cancelled; index += 1) {
-        await loadFrame(safeFrames[index], index, 'low');
+    const loadRemainingFrames = () => {
+      const remainingIndexes = Array.from({ length: safeFrames.length - eagerCount }, (_, offset) => eagerCount + offset);
+      let cursor = 0;
+
+      const worker = async () => {
+        while (!cancelled && cursor < remainingIndexes.length) {
+          const index = remainingIndexes[cursor];
+          cursor += 1;
+          await loadFrame(safeFrames[index], index, 'low');
+        }
+      };
+
+      const workerCount = Math.min(BACKGROUND_CONCURRENCY, remainingIndexes.length);
+      for (let i = 0; i < workerCount; i += 1) {
+        void worker();
       }
     };
 
