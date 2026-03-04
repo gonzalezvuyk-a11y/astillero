@@ -6,6 +6,7 @@ export type ProcessStep = {
   number: string;
   title: string;
   description: string;
+  highlight?: boolean;
 };
 
 type ProcessTimelineProps = {
@@ -54,16 +55,30 @@ export default function ProcessTimeline({ steps, className }: ProcessTimelinePro
         {steps.map((step, index) => (
           <li
             key={`${step.number}-${step.title}`}
-            className="process-step-item"
+            className={`process-step-item ${step.highlight ? 'process-step-item--highlight' : ''}`.trim()}
             style={{ '--process-delay': `${index * 80}ms` } as CSSProperties}
           >
-            <article className="process-step-card" tabIndex={0}>
+            <article className={`process-step-card ${step.highlight ? 'process-step-card--highlight' : ''}`.trim()} tabIndex={0}>
               <span className="process-step-node" aria-hidden="true" />
-              <p className="text-primary text-[11px] font-semibold tracking-[0.2em] uppercase">{step.number}</p>
-              <h3 className="mt-3 font-condensed text-2xl md:text-[1.75rem] leading-[0.95] uppercase tracking-[0.01em] text-text-100">
+              <p
+                className={`mt-2 md:mt-0 text-[11px] leading-none font-semibold tracking-[0.2em] uppercase ${
+                  step.highlight
+                    ? 'text-primary'
+                    : 'text-primary'
+                }`}
+              >
+                {step.number}
+              </p>
+              <h3
+                className={`mt-3 font-condensed text-2xl md:text-[1.75rem] leading-[0.95] uppercase tracking-[0.01em] ${
+                  step.highlight ? 'text-primary' : 'text-text-100'
+                }`}
+              >
                 {step.title}
               </h3>
-              <p className="mt-3 text-sm md:text-[0.95rem] text-text-200 leading-relaxed">{step.description}</p>
+              <p className={`mt-3 text-sm md:text-[0.95rem] leading-relaxed ${step.highlight ? 'text-text-100/90' : 'text-text-200'}`}>
+                {step.description}
+              </p>
             </article>
           </li>
         ))}

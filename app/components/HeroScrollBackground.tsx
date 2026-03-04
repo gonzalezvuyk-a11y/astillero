@@ -7,6 +7,7 @@ type HeroScrollBackgroundProps = {
   sectionId: string;
   className?: string;
   zoom?: number;
+  introZoomStart?: number;
   anchorY?: number;
   fit?: 'cover' | 'contain';
   onProgress?: (progress: number) => void;
@@ -17,6 +18,7 @@ export default function HeroScrollBackground({
   sectionId,
   className,
   zoom = 1.18,
+  introZoomStart = 1.4,
   anchorY = 0.52,
   fit = 'cover',
   onProgress
@@ -28,7 +30,11 @@ export default function HeroScrollBackground({
   const targetProgressRef = useRef(0);
   const currentProgressRef = useRef(0);
   const mountedRef = useRef(false);
-  const introZoomRef = useRef(1.4); // Start zoomed in for the intro
+  const introZoomRef = useRef(introZoomStart);
+
+  useEffect(() => {
+    introZoomRef.current = introZoomStart;
+  }, [introZoomStart]);
 
   const safeFrames = useMemo(() => (frames.length > 0 ? frames : []), [frames]);
 

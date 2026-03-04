@@ -194,7 +194,8 @@ const processSteps: ProcessStep[] = [
   {
     number: '04',
     title: 'Instalación',
-    description: 'Entrega + puesta en marcha.'
+    description: 'Entrega + puesta en marcha.',
+    highlight: true
   }
 ];
 
@@ -244,6 +245,7 @@ export default function Home() {
 
       <section
         className="next-section-overlap -mt-[100vh] py-28 bg-[#ece8e0] relative z-20"
+        data-header-logo="dark"
         data-reveal="up"
       >
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
@@ -306,7 +308,7 @@ export default function Home() {
                     </span>
                   </div>
 
-                  <h3 className="mt-6 font-condensed font-bold text-4xl md:text-5xl leading-[0.92] uppercase tracking-[0.01em] text-text-100">
+                  <h3 className="mt-6 font-condensed font-bold text-4xl md:text-5xl leading-[1.02] uppercase tracking-[0.01em] text-text-100">
                     {card.title}
                   </h3>
                   <p className="mt-4 text-text-200 text-base md:text-lg max-w-xl">{card.description}</p>
@@ -322,7 +324,7 @@ export default function Home() {
                     ))}
                   </div>
 
-                  <div className="mt-auto pt-10 border-t border-bg-300">
+                  <div className="mt-10 md:mt-auto pt-8 md:pt-10 border-t border-bg-300">
                     <a
                       href={card.ctaHref}
                       className="inline-flex items-center border border-bg-300 bg-bg-200 text-[11px] font-sans uppercase tracking-[0.16em] text-text-100 transition-colors duration-300 hover:border-primary hover:text-primary"
@@ -457,7 +459,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="contacto" className="py-24 bg-[#ece8e0] text-background-dark relative z-10 border-t border-bg-300">
+      <section id="contacto" className="py-24 bg-[#ece8e0] text-background-dark relative z-10 border-t border-bg-300" data-header-logo="dark">
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-start">
             <div data-reveal="left">
@@ -621,6 +623,19 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      <a
+        href={whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Escribir a WhatsApp"
+        className="fixed bottom-2 right-3 md:bottom-6 md:right-6 z-[70] inline-flex items-center gap-1.5 md:gap-2 border border-[#181a18] bg-primary text-[#181a18] px-3 py-2.5 md:px-4 md:py-3 text-[0.78rem] md:text-[0.92rem] font-semibold uppercase tracking-[0.08em] shadow-[0_10px_24px_rgba(0,0,0,0.28)] hover:bg-[#ff6a42] transition-colors duration-300"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[1rem] w-[1rem] md:h-[1.15rem] md:w-[1.15rem] fill-current">
+          <path d="M20.52 3.49A11.78 11.78 0 0 0 12.12.02C5.62.02.34 5.3.34 11.8c0 2.08.54 4.11 1.57 5.9L.02 24l6.45-1.69a11.73 11.73 0 0 0 5.62 1.44h.01c6.5 0 11.78-5.28 11.78-11.78a11.7 11.7 0 0 0-3.36-8.48ZM12.1 21.75h-.01a9.82 9.82 0 0 1-5.01-1.37l-.36-.22-3.82 1 1.02-3.72-.24-.38a9.78 9.78 0 0 1-1.5-5.22c0-5.41 4.41-9.82 9.82-9.82 2.62 0 5.08 1.02 6.93 2.87a9.73 9.73 0 0 1 2.88 6.95c0 5.41-4.41 9.82-9.81 9.82Zm5.38-7.34c-.29-.14-1.71-.84-1.98-.94-.26-.1-.45-.14-.65.14-.19.29-.74.94-.9 1.13-.16.19-.32.22-.61.08-.29-.14-1.2-.44-2.28-1.39a8.45 8.45 0 0 1-1.58-1.95c-.16-.29-.02-.45.12-.59.13-.13.29-.32.43-.48.14-.16.19-.29.29-.48.1-.19.05-.36-.02-.5-.07-.14-.65-1.56-.89-2.13-.23-.56-.46-.48-.65-.49h-.55c-.19 0-.5.07-.77.36-.26.29-1 1-1 2.43 0 1.43 1.03 2.8 1.18 3 .14.19 2.03 3.1 4.91 4.34.69.29 1.22.47 1.64.6.69.22 1.31.19 1.8.12.55-.08 1.71-.7 1.95-1.38.24-.67.24-1.25.17-1.37-.07-.12-.26-.19-.55-.34Z" />
+        </svg>
+        <span>Cotizá</span>
+      </a>
     </main>
   );
 }

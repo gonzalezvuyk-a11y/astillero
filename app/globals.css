@@ -262,6 +262,15 @@ textarea:focus-visible {
   background: #ede8df;
 }
 
+.product-gallery-touch-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.product-gallery-touch-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 .product-gallery-vignette {
   position: absolute;
   inset: 0;
@@ -360,6 +369,28 @@ textarea:focus-visible {
     background-color 240ms ease;
 }
 
+.process-step-card--highlight {
+  border-color: color-mix(in srgb, var(--text-200) 18%, transparent);
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--primary-100) 14%, var(--bg-200)) 0%,
+      color-mix(in srgb, var(--bg-200) 92%, transparent) 54%,
+      color-mix(in srgb, var(--bg-100) 95%, transparent) 100%
+    );
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.22);
+}
+
+.process-step-card--highlight::before {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.process-step-card--highlight .process-step-node {
+  background: var(--primary-100);
+  transform: scale(1.12);
+}
+
 .process-step-card::before {
   content: '';
   position: absolute;
@@ -402,6 +433,11 @@ textarea:focus-visible {
 .process-step-card:focus-visible .process-step-node {
   background: var(--primary-100);
   transform: scale(1.12);
+}
+
+.process-step-card--highlight:hover,
+.process-step-card--highlight:focus-visible {
+  border-color: color-mix(in srgb, var(--text-200) 28%, transparent);
 }
 
 .process-timeline.is-visible .process-rail-horizontal {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
@@ -21,10 +21,28 @@ interface ProductGalleryProps {
 export default function ProductGallery({ products }: ProductGalleryProps) {
     const containerRef = useRef<HTMLElement>(null);
     const trackRef = useRef<HTMLDivElement>(null);
+    const [isMobile, setIsMobile] = useState(
+        typeof window !== 'undefined' ? window.matchMedia('(max-width: 767px)').matches : false
+    );
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        const media = window.matchMedia('(max-width: 767px)');
+        const update = () => setIsMobile(media.matches);
+
+        update();
+        media.addEventListener('change', update);
+        return () => media.removeEventListener('change', update);
+    }, []);
 
     useGSAP(
         () => {
             if (!trackRef.current || !containerRef.current) return;
+            if (isMobile) {
+                gsap.set(trackRef.current, { clearProps: 'transform,willChange' });
+                return;
+            }
 
             const track = trackRef.current;
             const container = containerRef.current;
@@ -66,27 +84,31 @@ export default function ProductGallery({ products }: ProductGalleryProps) {
                 gsap.set(track, { clearProps: 'willChange' });
             };
         },
-        { scope: containerRef }
+        { scope: containerRef, dependencies: [isMobile] }
     );
 
     return (
         <section
             ref={containerRef}
-            className="product-gallery-section relative py-12 md:py-20 overflow-hidden z-20 border-t border-bg-300 h-screen max-h-[900px] flex flex-col justify-center bg-[#e6ccba]"
+            data-header-logo="dark"
+            className="product-gallery-section relative py-10 md:py-20 overflow-hidden z-20 border-t border-bg-300 md:h-screen md:max-h-[900px] flex flex-col justify-center bg-[#e6ccba]"
         >
-            <div className="max-w-[1600px] w-full mx-auto px-6 md:px-12 relative z-20 mb-8 md:mb-12 shrink-0">
-                <h2 className="font-condensed font-bold text-4xl md:text-5xl lg:text-6xl uppercase tracking-[0.01em] text-background-dark">
+            <div className="max-w-[1600px] w-full mx-auto px-6 md:px-12 relative z-20 mb-3 md:mb-12 shrink-0">
+                <h2 className="font-condensed font-bold text-[2.35rem] md:text-5xl lg:text-6xl uppercase tracking-[0.01em] text-background-dark">
                     Línea de Parrillas
                 </h2>
-                <p className="mt-4 text-background-dark/70 max-w-2xl font-medium text-lg">
+                <p className="mt-2 md:mt-4 text-background-dark/70 max-w-2xl font-medium text-base md:text-lg">
                     Equipos diseñados milímetro a milímetro. Deslizá para conocer las series.
                 </p>
             </div>
 
-            <div className="w-full relative z-20 overflow-visible shrink-0 mt-4 md:mt-8">
-                <div ref={trackRef} className="product-track w-max flex gap-4 md:gap-6 px-6 md:px-12 items-end pb-8 transform-gpu">
+            <div
+                className="product-gallery-touch-scroll w-full relative z-20 overflow-x-auto md:overflow-visible shrink-0 mt-0 md:mt-8 touch-pan-x overscroll-x-contain"
+                style={{ WebkitOverflowScrolling: 'touch' }}
+            >
+                <div ref={trackRef} className="product-track w-max flex gap-4 md:gap-6 px-6 md:px-12 pr-6 md:pr-12 items-end pb-8 transform-gpu snap-x snap-mandatory md:snap-none">
                     {products.map((product, i) => (
-                        <article key={i} className="product-gallery-card group relative flex flex-col w-[75vw] md:w-[32vw] lg:w-[26vw] xl:w-[23vw] bg-[#f4f2ed] border-[1.5px] border-[#dcd7cd] shadow-sm transition-transform duration-500 ease-out hover:-translate-y-1 shrink-0">
+                        <article key={i} className="product-gallery-card group relative flex flex-col w-[75vw] md:w-[32vw] lg:w-[26vw] xl:w-[23vw] bg-[#f4f2ed] border-[1.5px] border-[#dcd7cd] shadow-sm transition-transform duration-500 ease-out hover:-translate-y-1 shrink-0 snap-start">
                             {/* Image Container */}
                             <div className="flex-1 w-full aspect-[4/5] sm:aspect-square flex items-center justify-center p-6 md:p-10 overflow-hidden">
                                 <Image
