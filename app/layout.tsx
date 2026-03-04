@@ -50,8 +50,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className="dark">
-      <body className={`${inter.variable} ${oswald.variable} ${beni.variable}`}>
+    <html lang="es" className="dark" suppressHydrationWarning>
+      <body className={`${inter.variable} ${oswald.variable} ${beni.variable}`} suppressHydrationWarning>
         <a href="#main-content" className="skip-link">
           Saltar al contenido principal
         </a>
