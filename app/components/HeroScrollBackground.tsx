@@ -45,7 +45,6 @@ export default function HeroScrollBackground({
 
   useEffect(() => {
     if (safeFrames.length === 0) return;
-    let timeoutId: number | null = null;
     let cancelled = false;
     loadedFramesRef.current = new Array(safeFrames.length);
 
@@ -53,7 +52,7 @@ export default function HeroScrollBackground({
       new Promise<void>((resolve) => {
         const img = new Image();
         img.decoding = 'async';
-        img.loading = index === 0 ? 'eager' : 'lazy';
+        img.loading = 'eager';
         if ('fetchPriority' in img) {
           (img as HTMLImageElement & { fetchPriority?: 'high' | 'low' }).fetchPriority = priority;
         }
@@ -65,24 +64,12 @@ export default function HeroScrollBackground({
         img.onerror = () => resolve();
       });
 
-    let nextIndex = 1;
-    const loadRemainingFrames = () => {
-      if (cancelled || nextIndex >= safeFrames.length) return;
-
-      void loadFrame(safeFrames[nextIndex], nextIndex, 'low').finally(() => {
-        nextIndex += 1;
-        if (cancelled || nextIndex >= safeFrames.length) return;
-        timeoutId = window.setTimeout(loadRemainingFrames, 16);
-      });
-    };
-
-    void loadFrame(safeFrames[0], 0, 'high').finally(loadRemainingFrames);
+    safeFrames.forEach((src, index) => {
+      void loadFrame(src, index, index < 2 ? 'high' : 'low');
+    });
 
     return () => {
       cancelled = true;
-      if (timeoutId !== null) {
-        window.clearTimeout(timeoutId);
-      }
       loadedFramesRef.current = [];
     };
   }, [safeFrames]);

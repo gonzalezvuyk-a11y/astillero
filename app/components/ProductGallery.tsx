@@ -27,27 +27,44 @@ export default function ProductGallery({ products }: ProductGalleryProps) {
             if (!trackRef.current || !containerRef.current) return;
 
             const track = trackRef.current;
+            const container = containerRef.current;
 
             // Calculate how far we need to translate horizontally
             // It's the full scroll width of the track minus the viewport width
-            const getScrollAmount = () => -(track.scrollWidth - window.innerWidth);
+            const getScrollAmount = () => {
+                const viewportWidth = container.clientWidth || window.innerWidth;
+                return Math.min(0, -(track.scrollWidth - viewportWidth));
+            };
+
+            gsap.set(track, { force3D: true, willChange: 'transform' });
+
+            if (getScrollAmount() === 0) return;
 
             // Create a tween that moves the track horizontally
             const tween = gsap.to(track, {
                 x: getScrollAmount,
-                ease: "none"
+                ease: "none",
+                overwrite: "auto"
             });
 
             // Tie this horizontal tween to the vertical scroll of the section
-            ScrollTrigger.create({
-                trigger: containerRef.current,
+            const trigger = ScrollTrigger.create({
+                trigger: container,
                 animation: tween,
                 start: "top top",
                 end: () => `+=${getScrollAmount() * -1}`, // Scroll distance equals horizontal distance
-                scrub: 1, // Smooth scrubbing
+                scrub: 0.45, // Menos latencia visual en el seguimiento
                 pin: true, // Pin the section while we scroll horizontally
-                invalidateOnRefresh: true // Recalculate on resize
+                invalidateOnRefresh: true, // Recalculate on resize
+                anticipatePin: 1,
+                fastScrollEnd: true
             });
+
+            return () => {
+                trigger.kill();
+                tween.kill();
+                gsap.set(track, { clearProps: 'willChange' });
+            };
         },
         { scope: containerRef }
     );
@@ -67,18 +84,21 @@ export default function ProductGallery({ products }: ProductGalleryProps) {
             </div>
 
             <div className="w-full relative z-20 overflow-visible shrink-0 mt-4 md:mt-8">
-                <div ref={trackRef} className="product-track w-max flex gap-4 md:gap-6 px-6 md:px-12 items-end pb-8">
+                <div ref={trackRef} className="product-track w-max flex gap-4 md:gap-6 px-6 md:px-12 items-end pb-8 transform-gpu">
                     {products.map((product, i) => (
-                        <article key={i} className="group relative flex flex-col w-[75vw] md:w-[32vw] lg:w-[26vw] xl:w-[23vw] bg-[#f4f2ed] border-[1.5px] border-[#dcd7cd] shadow-sm transition-transform duration-500 ease-out hover:-translate-y-2 shrink-0">
+                        <article key={i} className="product-gallery-card group relative flex flex-col w-[75vw] md:w-[32vw] lg:w-[26vw] xl:w-[23vw] bg-[#f4f2ed] border-[1.5px] border-[#dcd7cd] shadow-sm transition-transform duration-500 ease-out hover:-translate-y-1 shrink-0">
                             {/* Image Container */}
                             <div className="flex-1 w-full aspect-[4/5] sm:aspect-square flex items-center justify-center p-6 md:p-10 overflow-hidden">
                                 <Image
                                     src={product.image}
                                     alt={product.title}
-                                    width={960}
-                                    height={960}
-                                    sizes="(max-width: 768px) 75vw, (max-width: 1280px) 32vw, 26vw"
-                                    className="w-full h-full object-contain filter drop-shadow-xl transition-transform duration-700 ease-out group-hover:scale-105"
+                                    width={720}
+                                    height={720}
+                                    quality={72}
+                                    priority={i < 2}
+                                    loading={i < 2 ? 'eager' : 'lazy'}
+                                    sizes="(max-width: 768px) 70vw, (max-width: 1280px) 28vw, 24vw"
+                                    className="w-full h-full object-contain transition-transform duration-500 ease-out group-hover:scale-[1.02]"
                                 />
                             </div>
 
