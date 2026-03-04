@@ -1,52 +1,68 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+
 export default function AstilleroFooterLogo({ className = '' }: { className?: string }) {
+  const letters = Array.from('EL ASTILLERO');
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const wordmarkRef = useRef<HTMLDivElement | null>(null);
+  const [fontSizePx, setFontSizePx] = useState<number | null>(null);
+
+  useEffect(() => {
+    const shell = shellRef.current;
+    const wordmark = wordmarkRef.current;
+    if (!shell || !wordmark || typeof window === 'undefined') return;
+
+    const updateSize = () => {
+      const availableWidth = shell.getBoundingClientRect().width;
+      if (!availableWidth) return;
+
+      const naturalWidth = wordmark.scrollWidth;
+      const baseFontSize = Number.parseFloat(window.getComputedStyle(wordmark).fontSize);
+      if (!naturalWidth || !baseFontSize) return;
+
+      const nextFontSize = Math.max(14, (baseFontSize * availableWidth) / naturalWidth);
+      setFontSizePx((previous) => (previous !== null && Math.abs(previous - nextFontSize) < 0.5 ? previous : nextFontSize));
+    };
+
+    updateSize();
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(shell);
+    window.addEventListener('resize', updateSize, { passive: true });
+
+    const fontSet = document.fonts;
+    const handleFontLoadingDone = () => updateSize();
+    fontSet?.ready.then(updateSize).catch(() => undefined);
+    fontSet?.addEventListener?.('loadingdone', handleFontLoadingDone);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateSize);
+      fontSet?.removeEventListener?.('loadingdone', handleFontLoadingDone);
+    };
+  }, []);
+
   return (
-    <svg
-      id="Capa_2"
-      data-name="Capa 2"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 276.74 86.47"
-      className={`text-text-100/15 ${className}`}
-    >
-      <style>
-        {`
-          .footer-logo-text {
-            fill: #181a18;
-            font-family: BeniBold, Beni, sans-serif;
-            font-size: 89.46px;
-          }
-          .footer-logo-char {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: default;
-          }
-          .footer-logo-char:hover {
-            opacity: 1;
-            fill: var(--primary-100);
-            transition: all 0.05s ease-out; /* snap fast to fire when hovered */
-          }
-          .cls-2 { letter-spacing: .02em; }
-          .cls-3 { letter-spacing: .02em; }
-          .cls-4 { letter-spacing: .01em; }
-          .cls-5 { letter-spacing: .02em; }
-          .cls-6 { letter-spacing: 0em; }
-          .cls-7 { letter-spacing: 0em; }
-          .cls-8 { letter-spacing: .01em; }
-          .cls-9 { letter-spacing: 0em; }
-        `}
-      </style>
-      <g id="Capa_1-2" data-name="Capa 1">
-        <text className="footer-logo-text" transform="translate(0 72.87)">
-          <tspan className="cls-9 footer-logo-char" x="0" y="0">E</tspan>
-          <tspan className="cls-3 footer-logo-char" x="22.03" y="0">L </tspan>
-          <tspan className="cls-8 footer-logo-char" x="58.44" y="0">A</tspan>
-          <tspan className="cls-2 footer-logo-char" x="87.04" y="0">S</tspan>
-          <tspan className="cls-4 footer-logo-char" x="116.27" y="0">T</tspan>
-          <tspan className="cls-7 footer-logo-char" x="139.35" y="0">I</tspan>
-          <tspan className="cls-5 footer-logo-char" x="153.89" y="0">LL</tspan>
-          <tspan className="cls-9 footer-logo-char" x="196.67" y="0">E</tspan>
-          <tspan className="cls-6 footer-logo-char" x="218.71" y="0">R</tspan>
-          <tspan className="cls-3 footer-logo-char" x="248.56" y="0">O</tspan>
-        </text>
-      </g>
-    </svg>
+    <div ref={shellRef} className={`footer-wordmark-scale-shell ${className}`.trim()}>
+      <div
+        ref={wordmarkRef}
+        className="footer-wordmark"
+        role="img"
+        aria-label="El Astillero"
+        style={fontSizePx ? { fontSize: `${fontSizePx}px` } : undefined}
+      >
+        {letters.map((letter, index) =>
+          letter === ' ' ? (
+            <span key={`space-${index}`} className="footer-letter-space" aria-hidden="true">
+              &nbsp;
+            </span>
+          ) : (
+            <span key={`${letter}-${index}`} className="footer-letter" tabIndex={0}>
+              {letter}
+            </span>
+          )
+        )}
+      </div>
+    </div>
   );
 }

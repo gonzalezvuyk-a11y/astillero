@@ -6,6 +6,10 @@ import HeaderBar from './components/HeaderBar';
 import ScrollReveal from './components/ScrollReveal';
 import AstilleroFooterLogo from './components/AstilleroFooterLogo';
 import ProductGallery from './components/ProductGallery';
+import DetailExplorer from './components/DetailExplorer';
+import ProjectsRealGrid from './components/ProjectsRealGrid';
+import ProcessTimeline, { type ProcessStep } from './components/ProcessTimeline';
+import FooterPremiumEffects from './components/FooterPremiumEffects';
 
 const whatsappMessage =
   'Hola, quiero cotizar una parrilla El Astillero. Tipo: ____. Medidas aprox: __ x __. Ciudad: ____. Tengo foto/plano: sí/no.';
@@ -26,54 +30,117 @@ const benefits = [
   }
 ];
 
-const featuredModels = [
+type ModelSolutionCard = {
+  title: string;
+  tag: string;
+  quoteType: 'COTIZACIÓN' | 'A MEDIDA';
+  description: string;
+  specs: [string, string, string];
+  cta: 'Ver modelos' | 'Cotizar';
+  ctaHref: string;
+  image: string;
+  layout: 'featured' | 'compact';
+};
+
+// Para cambiar por renders/macros de El Astillero, reemplazá solo el valor de `image` en cada card.
+const modelSolutionCards: ModelSolutionCard[] = [
   {
-    label: 'Signature Series',
-    price: '$ Upon Request',
     title: 'Empotrables con vidrio',
-    text: 'Look arquitectónico, integrado al quincho. Diseño premium que combina presencia visual y rendimiento.',
-    features: ['Acero inox 304', 'Herrajes de precisión', 'Iluminación LED opcional'],
-    image:
-      'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80'
+    tag: 'SIGNATURE SERIES',
+    quoteType: 'COTIZACIÓN',
+    description: 'Integración limpia para quinchos premium con presencia arquitectónica.',
+    specs: ['Inox 304', 'Frente vidrio', 'Guías de precisión'],
+    cta: 'Cotizar',
+    ctaHref: '#contacto',
+    image: '/modelos/empotrables.png',
+    layout: 'featured'
   },
   {
-    label: 'Bespoke Design',
-    price: 'Custom Quote',
     title: 'Quinchos completos / rediseño',
-    text: 'Upgrade total del área de asado. Proyecto integral desde concepto, fabricación e instalación final.',
-    features: ['Diseño arquitectónico', 'Materiales premium', 'Integración total'],
-    image:
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1200&q=80'
-  }
-];
-
-const modelTiles = [
+    tag: 'BESPOKE DESIGN',
+    quoteType: 'A MEDIDA',
+    description: 'Proyecto integral desde diseño técnico hasta instalación final.',
+    specs: ['Planificación 360°', 'Materiales premium', 'Instalación experta'],
+    cta: 'Cotizar',
+    ctaHref: '#contacto',
+    image: '/modelos/quincho.png',
+    layout: 'featured'
+  },
   {
     title: 'Parrillas para terraza',
-    cta: 'Ver detalles',
-    image:
-      'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=900&q=80'
+    tag: 'TERRAZAS',
+    quoteType: 'COTIZACIÓN',
+    description: 'Versiones compactas y robustas para espacios urbanos exigentes.',
+    specs: ['Formato compacto', 'Ventilación optimizada', 'Terminación mate'],
+    cta: 'Ver modelos',
+    ctaHref: '#modelos',
+    image: '/modelos/terraza.png',
+    layout: 'compact'
   },
   {
     title: 'Fogoneros',
-    cta: 'Ver detalles',
-    image:
-      'https://images.unsplash.com/photo-1470115636492-6d2b56f9146d?auto=format&fit=crop&w=900&q=80'
+    tag: 'LÍNEA FUEGO',
+    quoteType: 'A MEDIDA',
+    description: 'Piezas de alto impacto visual para encuentros alrededor del fuego.',
+    specs: ['Acabado resistente', 'Control de calor', 'Opciones modulares'],
+    cta: 'Ver modelos',
+    ctaHref: '#modelos',
+    image: '/modelos/fogonero.png',
+    layout: 'compact'
   },
   {
     title: 'Revestimientos inox',
-    cta: 'Ver detalles',
-    image:
-      'https://images.unsplash.com/photo-1517999144091-3d9dca6d1e43?auto=format&fit=crop&w=900&q=80'
+    tag: 'DETALLE TÉCNICO',
+    quoteType: 'COTIZACIÓN',
+    description: 'Protección térmica y estética continua para áreas de cocción premium.',
+    specs: ['Calibre reforzado', 'Fácil mantenimiento', 'Cortes a medida'],
+    cta: 'Cotizar',
+    ctaHref: '#contacto',
+    image: '/modelos/revestimiento.png',
+    layout: 'compact'
   }
 ];
 
-const detailShots = [
-  { label: 'Frontal', image: 'https://images.unsplash.com/photo-1529694157872-4e0c0f3b238b?auto=format&fit=crop&w=1400&q=80' },
-  { label: '3/4', image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1400&q=80' },
-  { label: 'Lateral', image: 'https://images.unsplash.com/photo-1514517220031-1f8f58ce56d9?auto=format&fit=crop&w=1400&q=80' },
-  { label: 'Macro manija', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1400&q=80' },
-  { label: 'Macro vidrio', image: 'https://images.unsplash.com/photo-1516684669134-de6f7c473a2a?auto=format&fit=crop&w=1400&q=80' }
+const featuredModelCards = modelSolutionCards.filter((card) => card.layout === 'featured');
+const compactModelCards = modelSolutionCards.filter((card) => card.layout === 'compact');
+
+const details = [
+  {
+    id: 'inox-cepillado',
+    title: 'INOX CEPILLADO',
+    desc: 'Durabilidad real. Estética premium.',
+    imageSrc: '/detalles/1.png'
+  },
+  {
+    id: 'guias-guillotina',
+    title: 'GUÍAS GUILLOTINA',
+    desc: 'Apertura suave y segura.',
+    imageSrc: '/detalles/2.png'
+  },
+  {
+    id: 'vidrio-ahumado',
+    title: 'VIDRIO AHUMADO',
+    desc: 'Visibilidad sin perder elegancia.',
+    imageSrc: '/detalles/3.png'
+  },
+  {
+    id: 'herrajes-inox',
+    title: 'HERRAJES INOX',
+    desc: 'Robusto, sólido, preciso.',
+    imageSrc: '/detalles/4.png'
+  },
+  {
+    id: 'cajon-cenicero',
+    title: 'CAJÓN CENICERO',
+    desc: 'Limpieza fácil para uso diario.',
+    imageSrc: '/detalles/5.png'
+  },
+  {
+    id: 'parrilla-brasero',
+    title: 'PARRILLA / BRASERO',
+    desc: 'Control térmico y rendimiento constante.',
+    imageSrc: '/detalles/6.png'
+  }
 ];
 
 const rasterImageExtensions = new Set(['.png', '.jpg', '.jpeg', '.webp', '.avif']);
@@ -108,86 +175,60 @@ function getHeroGifFrames() {
 
 const heroGifFrames = getHeroGifFrames();
 
-const steps = ['Medimos / recibimos medidas', 'Diseñamos propuesta', 'Fabricamos', 'Instalamos y entregamos'];
-
-const testimonialQuotes = [
-  '“Terminación impecable, se nota el nivel.”',
-  '“Quedó integrado perfecto al quincho.”',
-  '“Instalación prolija y materiales top.”'
+const processSteps: ProcessStep[] = [
+  {
+    number: '01',
+    title: 'Medimos / Brief',
+    description: 'Medidas, fotos y ubicación.'
+  },
+  {
+    number: '02',
+    title: 'Propuesta',
+    description: 'Modelo + opciones + presupuesto.'
+  },
+  {
+    number: '03',
+    title: 'Fabricación',
+    description: 'Taller + terminación premium.'
+  },
+  {
+    number: '04',
+    title: 'Instalación',
+    description: 'Entrega + puesta en marcha.'
+  }
 ];
 
-const fallbackProjectPhotos = [
-  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1543353071-10c8ba85a904?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1556910096-6f5e72db6803?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=80'
-];
+const instagramProfileUrl = 'https://www.instagram.com/parrillaselastillero/';
 
-type InstagramMediaItem = {
-  id: string;
-  media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM' | string;
-  media_url?: string;
-  thumbnail_url?: string;
-  permalink?: string;
-};
+function getProjectGridImages() {
+  const projectsDir = path.join(process.cwd(), 'public', 'proyectos');
+  if (!existsSync(projectsDir)) return [];
 
-type ProjectPhoto = {
-  src: string;
-  permalink?: string;
-};
-
-async function getInstagramProjectPhotos(): Promise<ProjectPhoto[]> {
-  const igUserId = process.env.INSTAGRAM_USER_ID;
-  const igAccessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
-
-  if (!igUserId || !igAccessToken) {
-    return fallbackProjectPhotos.map((src) => ({ src }));
-  }
-
-  try {
-    const params = new URLSearchParams({
-      fields: 'id,media_type,media_url,thumbnail_url,permalink,timestamp',
-      limit: '9',
-      access_token: igAccessToken
-    });
-
-    const response = await fetch(`https://graph.facebook.com/v23.0/${igUserId}/media?${params.toString()}`, {
-      next: { revalidate: 3600 }
-    });
-
-    if (!response.ok) {
-      return fallbackProjectPhotos.map((src) => ({ src }));
-    }
-
-    const payload = (await response.json()) as { data?: InstagramMediaItem[] };
-    const photosRaw: Array<ProjectPhoto | null> =
-      payload.data?.map((item) => {
-        const src = item.media_type === 'VIDEO' ? item.thumbnail_url : item.media_url;
-        return src ? { src, permalink: item.permalink } : null;
-      }) ?? [];
-    const photos = photosRaw.filter((item): item is ProjectPhoto => item !== null).slice(0, 9);
-
-    return photos.length > 0 ? photos : fallbackProjectPhotos.map((src) => ({ src }));
-  } catch {
-    return fallbackProjectPhotos.map((src) => ({ src }));
-  }
+  return readdirSync(projectsDir)
+    .filter((file) => rasterImageExtensions.has(path.extname(file).toLowerCase()))
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
+    .slice(0, 12)
+    .map((file) => `/proyectos/${encodeURIComponent(file)}`);
 }
 
-const footerSparks = Array.from({ length: 18 }).map((_, i) => ({
+const projectGridImages = getProjectGridImages();
+
+const heroSparks = Array.from({ length: 18 }).map((_, i) => ({
   left: `${Math.random() * 100}%`,
   delay: `${(Math.random() * 3).toFixed(1)}s`,
   duration: `${(Math.random() * 2 + 4).toFixed(1)}s`,
   size: Math.floor(Math.random() * 3) + 2
 }));
 
-export default async function Home() {
-  const projectPhotos = await getInstagramProjectPhotos();
+const FOOTER_EMBER_COUNT = 12;
+const footerEmbers = Array.from({ length: FOOTER_EMBER_COUNT }).map(() => ({
+  left: `${Math.random() * 100}%`,
+  delay: `${(Math.random() * 2.4).toFixed(1)}s`,
+  duration: `${(Math.random() * 2.2 + 4.8).toFixed(1)}s`,
+  size: Math.floor(Math.random() * 3) + 2
+}));
 
+export default function Home() {
   return (
     <main className="bg-background-dark text-text-100 font-sans antialiased selection:bg-primary selection:text-text-100">
       <ScrollReveal />
@@ -199,7 +240,7 @@ export default async function Home() {
 
       <HeaderBar />
 
-      <HeroSection heroGifFrames={heroGifFrames} whatsappUrl={whatsappUrl} sparks={footerSparks} />
+      <HeroSection heroGifFrames={heroGifFrames} whatsappUrl={whatsappUrl} sparks={heroSparks} />
 
       <section
         className="next-section-overlap -mt-[100vh] py-28 bg-[#ece8e0] relative z-20"
@@ -237,45 +278,60 @@ export default async function Home() {
           </h2>
 
           <div className="mt-12 space-y-6">
-            {featuredModels.map((model, index) => (
+            {featuredModelCards.map((card, index) => (
               <article
-                key={model.title}
+                key={card.title}
                 className={`grid grid-cols-1 md:grid-cols-2 border border-bg-300 bg-surface-dark ${index % 2 === 1 ? 'md:[&>*:first-child]:order-2' : ''
                   }`}
                 data-reveal={index % 2 === 1 ? 'left' : 'right'}
               >
-                <div className="relative min-h-[340px]">
+                <div className="group relative min-h-[340px] overflow-hidden">
                   <Image
-                    src={model.image}
-                    alt={model.title}
+                    src={card.image}
+                    alt={card.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    className="h-full w-full object-cover grayscale"
+                    className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/35 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 </div>
 
                 <div className="p-8 md:p-10 flex flex-col">
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center justify-between gap-4">
                     <span className="text-[11px] text-primary border border-primary px-2 py-1 uppercase tracking-[0.18em] font-semibold">
-                      {model.label}
+                      {card.tag}
                     </span>
-                    <span className="text-text-200 text-sm">{model.price}</span>
+                    <span className="text-[11px] text-text-100 border border-bg-300 px-2 py-1 uppercase tracking-[0.18em] font-semibold">
+                      {card.quoteType}
+                    </span>
                   </div>
 
                   <h3 className="mt-6 font-condensed font-bold text-4xl md:text-5xl leading-[0.92] uppercase tracking-[0.01em] text-text-100">
-                    {model.title}
+                    {card.title}
                   </h3>
-                  <p className="mt-5 text-text-200 text-base md:text-lg max-w-xl">{model.text}</p>
+                  <p className="mt-4 text-text-200 text-base md:text-lg max-w-xl">{card.description}</p>
+
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {card.specs.map((spec) => (
+                      <span
+                        key={`${card.title}-${spec}`}
+                        className="inline-flex items-center border border-bg-300 bg-bg-200 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-text-200"
+                      >
+                        {spec}
+                      </span>
+                    ))}
+                  </div>
 
                   <div className="mt-auto pt-10 border-t border-bg-300">
-                    <ul className="space-y-2">
-                      {model.features.map((feature) => (
-                        <li key={feature} className="text-xs uppercase tracking-[0.16em] text-text-200 flex items-center gap-2">
-                          <span className="text-primary">●</span>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
+                    <a
+                      href={card.ctaHref}
+                      className="inline-flex items-center border border-bg-300 bg-bg-200 text-[11px] font-sans uppercase tracking-[0.16em] text-text-100 transition-colors duration-300 hover:border-primary hover:text-primary"
+                    >
+                      <span className="px-4 py-3">{card.cta}</span>
+                      <span className="border-l border-bg-300 px-3 py-3">
+                        <span className="material-symbols-outlined text-[1rem] leading-none">north_east</span>
+                      </span>
+                    </a>
                   </div>
                 </div>
               </article>
@@ -283,26 +339,56 @@ export default async function Home() {
           </div>
 
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {modelTiles.map((item, index) => (
+            {compactModelCards.map((card, index) => (
               <article
-                key={item.title}
-                className="border border-bg-300 bg-surface-dark overflow-hidden"
+                key={card.title}
+                className="group border border-bg-300 bg-surface-dark overflow-hidden"
                 data-reveal="up"
                 data-reveal-delay={String(index * 100)}
               >
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  width={900}
-                  height={600}
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="h-72 w-full object-cover grayscale"
-                />
-                <div className="p-6 border-t border-bg-300">
-                  <h4 className="font-condensed text-3xl md:text-4xl uppercase tracking-[0.01em] text-text-100">{item.title}</h4>
-                  <a href="#contacto" className="inline-flex mt-3 text-sm uppercase tracking-[0.16em] text-text-200 hover:text-primary transition-colors">
-                    {item.cta}
-                  </a>
+                <div className="relative overflow-hidden">
+                  <Image
+                    src={card.image}
+                    alt={card.title}
+                    width={900}
+                    height={600}
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="h-72 w-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                </div>
+                <div className="p-6 border-t border-bg-300 flex flex-col">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-[10px] text-primary border border-primary px-2 py-1 uppercase tracking-[0.16em] font-semibold">
+                      {card.tag}
+                    </span>
+                    <span className="text-[10px] text-text-100 border border-bg-300 px-2 py-1 uppercase tracking-[0.16em] font-semibold">
+                      {card.quoteType}
+                    </span>
+                  </div>
+                  <h4 className="mt-4 font-condensed text-3xl md:text-4xl uppercase tracking-[0.01em] text-text-100">{card.title}</h4>
+                  <p className="mt-3 text-text-200 text-sm">{card.description}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {card.specs.map((spec) => (
+                      <span
+                        key={`${card.title}-compact-${spec}`}
+                        className="inline-flex items-center border border-bg-300 bg-bg-200 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-text-200"
+                      >
+                        {spec}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-8 pt-5 border-t border-bg-300">
+                    <a
+                      href={card.ctaHref}
+                      className="inline-flex items-center border border-bg-300 bg-bg-200 text-[11px] font-sans uppercase tracking-[0.16em] text-text-100 transition-colors duration-300 hover:border-primary hover:text-primary"
+                    >
+                      <span className="px-4 py-3">{card.cta}</span>
+                      <span className="border-l border-bg-300 px-3 py-3">
+                        <span className="material-symbols-outlined text-[1rem] leading-none">north_east</span>
+                      </span>
+                    </a>
+                  </div>
                 </div>
               </article>
             ))}
@@ -327,36 +413,9 @@ export default async function Home() {
             Terminaciones, herrajes y proporciones pensadas para que el quincho se vea premium incluso cuando no estás
             asando.
           </p>
-          <div className="mt-10 flex gap-5 overflow-x-auto pb-2">
-            {detailShots.map((shot, index) => (
-              <article
-                key={shot.label}
-                className="min-w-[85%] md:min-w-[32%] border border-bg-300 bg-surface-dark"
-                data-reveal="up"
-                data-reveal-delay={String(index * 90)}
-              >
-                <Image
-                  src={shot.image}
-                  alt={`Render ${shot.label}`}
-                  width={1400}
-                  height={900}
-                  sizes="(max-width: 768px) 85vw, 32vw"
-                  className="h-72 w-full object-cover"
-                />
-                <div className="px-4 py-3 text-xs uppercase tracking-[0.2em] text-text-200 border-t border-bg-300">
-                  {shot.label}
-                </div>
-              </article>
-            ))}
+          <div className="mt-10" data-reveal="up" data-reveal-delay="100">
+            <DetailExplorer details={details} whatsappUrl={whatsappUrl} />
           </div>
-          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="btn-solid-system on-dark group mt-10">
-            <span className="btn-text">Cotizar un modelo</span>
-            <span className="btn-icon">
-              <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">
-                north_east
-              </span>
-            </span>
-          </a>
         </div>
       </section>
 
@@ -365,19 +424,7 @@ export default async function Home() {
           <h2 className="font-condensed font-bold text-4xl md:text-6xl text-bone uppercase tracking-[0.01em]" data-reveal="up">
             Cómo trabajamos.
           </h2>
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-5">
-            {steps.map((step, index) => (
-              <article
-                key={step}
-                className="border border-bg-300 bg-surface-dark p-6"
-                data-reveal="up"
-                data-reveal-delay={String(index * 100)}
-              >
-                <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">Paso {index + 1}</p>
-                <p className="mt-4 text-text-200">{step}</p>
-              </article>
-            ))}
-          </div>
+          <ProcessTimeline steps={processSteps} />
         </div>
       </section>
 
@@ -389,49 +436,23 @@ export default async function Home() {
           <p className="mt-4 text-text-200 text-sm uppercase tracking-[0.2em]" data-reveal="up" data-reveal-delay="100">
             +X proyectos entregados en Paraguay
           </p>
-          <div className="mt-10 grid grid-cols-2 md:grid-cols-3 gap-3">
-            {projectPhotos.map((photo, index) =>
-              photo.permalink ? (
-                <a key={`${photo.src}-${index}`} href={photo.permalink} target="_blank" rel="noopener noreferrer" className="block">
-                  <Image
-                    src={photo.src}
-                    alt={`Proyecto real ${index + 1}`}
-                    width={900}
-                    height={700}
-                    sizes="(max-width: 768px) 50vw, 33vw"
-                    unoptimized
-                    className="h-40 md:h-52 w-full object-cover border border-bg-300"
-                    data-reveal="zoom"
-                    data-reveal-delay={String((index % 3) * 80)}
-                  />
-                </a>
-              ) : (
-                <Image
-                  key={`${photo.src}-${index}`}
-                  src={photo.src}
-                  alt={`Proyecto real ${index + 1}`}
-                  width={900}
-                  height={700}
-                  sizes="(max-width: 768px) 50vw, 33vw"
-                  unoptimized
-                  className="h-40 md:h-52 w-full object-cover border border-bg-300"
-                  data-reveal="zoom"
-                  data-reveal-delay={String((index % 3) * 80)}
-                />
-              )
-            )}
-          </div>
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5">
-            {testimonialQuotes.map((quote, index) => (
-              <blockquote
-                key={quote}
-                className="border border-bg-300 bg-surface-dark p-6 text-text-100 italic"
-                data-reveal="up"
-                data-reveal-delay={String(index * 110)}
-              >
-                {quote}
-              </blockquote>
-            ))}
+
+          <ProjectsRealGrid images={projectGridImages} profileUrl={instagramProfileUrl} />
+
+          <div className="mt-10 flex justify-center" data-reveal="up" data-reveal-delay="120">
+            <a
+              href={instagramProfileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-solid-system on-dark group hero-cta-compact font-sans"
+            >
+              <span className="btn-text">Ver más trabajos en Instagram</span>
+              <span className="btn-icon">
+                <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">
+                  north_east
+                </span>
+              </span>
+            </a>
           </div>
         </div>
       </section>
@@ -440,11 +461,13 @@ export default async function Home() {
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-start">
             <div data-reveal="left">
-              <p className="text-xs tracking-[0.3em] uppercase text-primary font-semibold">Servicio exclusivo</p>
-              <h2 className="mt-5 font-condensed font-bold text-[clamp(2.8rem,7vw,6.6rem)] uppercase leading-[0.88] tracking-[0.01em]">
+              <p className="inline-flex border border-primary px-3 py-2 text-xs font-semibold tracking-[0.3em] uppercase text-primary">
+                Servicio exclusivo
+              </p>
+              <h2 className="mt-8 md:mt-10 font-condensed font-bold text-[clamp(2.8rem,7vw,6.6rem)] uppercase leading-[0.88] tracking-[0.01em]">
                 Diseño
                 <br />
-                a medida<span className="text-primary">.</span>
+                a medida.
               </h2>
               <p className="mt-8 max-w-xl text-xl leading-relaxed text-background-dark/80">
                 Transformamos su visión en realidad. Consultoría personalizada para proyectos residenciales de alto nivel.
@@ -452,8 +475,8 @@ export default async function Home() {
 
               <div className="mt-10 space-y-4 text-bg-200">
                 <p className="flex items-center gap-3 text-lg">
-                  <span className="material-symbols-outlined text-primary">check_circle</span>
-                  Envíos a todo el país
+                  <span className="material-symbols-outlined text-primary">local_shipping</span>
+                  Cobertura en todo el país
                 </p>
                 <p className="flex items-center gap-3 text-lg">
                   <span className="material-symbols-outlined text-primary">verified</span>
@@ -525,11 +548,11 @@ export default async function Home() {
         </div>
       </section>
 
-      <footer className="relative overflow-hidden z-10 border-t border-bg-300 bg-bg-100">
+      <footer className="footer-premium relative overflow-hidden z-10 border-t border-bg-300 bg-bg-100">
         <div className="footer-sparks" aria-hidden="true">
-          {footerSparks.map((spark, index) => (
+          {footerEmbers.map((spark, index) => (
             <span
-              key={`spark-${index}`}
+              key={`footer-ember-${index}`}
               className="footer-spark"
               style={{
                 left: spark.left,
@@ -541,7 +564,8 @@ export default async function Home() {
             />
           ))}
         </div>
-        <div className="max-w-[1600px] mx-auto px-6 md:px-12 py-16 md:py-20">
+        <FooterPremiumEffects />
+        <div className="relative z-10 max-w-[1600px] mx-auto px-6 md:px-12 py-24 md:py-36">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
             <div>
               <p className="text-xs tracking-[0.18em] uppercase text-text-200/70 font-semibold">Quick Links</p>
@@ -586,9 +610,9 @@ export default async function Home() {
             </div>
           </div>
 
-          <div className="mt-14 border-t border-bg-300 pt-10">
-            <div className="w-full mb-6 relative z-10">
-              <AstilleroFooterLogo className="w-full h-auto object-contain select-none" />
+          <div className="mt-16 md:mt-24 border-t border-bg-300 pt-8 md:pt-10">
+            <div className="footer-logo-reveal-shell w-full mb-12 md:mb-16 relative z-10">
+              <AstilleroFooterLogo className="footer-logo-reveal w-full h-auto object-contain select-none" />
             </div>
             <div className="mt-5 flex flex-col md:flex-row md:items-center md:justify-between text-[11px] tracking-[0.14em] uppercase text-text-200/60 gap-2">
               <p>© 2026 El Astillero. All rights reserved.</p>
