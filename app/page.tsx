@@ -609,12 +609,10 @@ export default function Home() {
             <div>
               <p className="text-xs tracking-[0.18em] uppercase text-text-200/70 font-semibold">Social</p>
               <div className="mt-6 flex flex-wrap gap-6 text-text-200">
-                <a href="#" className="hover:text-primary transition-colors">
+                <a href={instagramProfileUrl} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                   Instagram
                 </a>
-                <a href="#" className="hover:text-primary transition-colors">
-                  Facebook
-                </a>
+                <span className="cursor-not-allowed opacity-60">Facebook (próx.)</span>
               </div>
             </div>
           </div>
