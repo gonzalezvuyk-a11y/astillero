@@ -72,6 +72,7 @@ const securityHeaders = [
 const nextConfig = {
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
+  devIndicators: false,
   outputFileTracingRoot: rootDir,
   images: {
     formats: ['image/avif', 'image/webp'],
