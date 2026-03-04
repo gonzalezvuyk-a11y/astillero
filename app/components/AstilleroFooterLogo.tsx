@@ -57,7 +57,7 @@ export default function AstilleroFooterLogo({ className = '' }: { className?: st
               &nbsp;
             </span>
           ) : (
-            <span key={`${letter}-${index}`} className="footer-letter" tabIndex={0}>
+            <span key={`${letter}-${index}`} className="footer-letter">
               {letter}
             </span>
           )

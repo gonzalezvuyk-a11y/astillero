@@ -25,6 +25,18 @@ const securityHeaders = [
     key: 'Cross-Origin-Resource-Policy',
     value: 'same-origin'
   },
+  {
+    key: 'X-DNS-Prefetch-Control',
+    value: 'off'
+  },
+  {
+    key: 'X-Permitted-Cross-Domain-Policies',
+    value: 'none'
+  },
+  {
+    key: 'Origin-Agent-Cluster',
+    value: '?1'
+  },
   ...(isProd
     ? [
         {
@@ -40,6 +52,8 @@ const securityHeaders = [
             "img-src 'self' data: blob: https:",
             "font-src 'self' data: https://fonts.gstatic.com",
             "connect-src 'self' https://graph.facebook.com",
+            "object-src 'none'",
+            "frame-src 'none'",
             "frame-ancestors 'none'",
             "base-uri 'self'",
             "form-action 'self'",
@@ -83,6 +97,15 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable'
+          }
+        ]
+      },
+      {
+        source: '/(detalles|modelos|proyectos)/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=2592000, stale-while-revalidate=604800'
           }
         ]
       },

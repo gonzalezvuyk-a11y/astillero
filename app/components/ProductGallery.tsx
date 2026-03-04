@@ -1,142 +1,162 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import Image from 'next/image';
-
-if (typeof window !== 'undefined') {
-    gsap.registerPlugin(ScrollTrigger);
-}
+import Icon from './Icon';
 
 interface ProductGalleryProps {
-    products: {
-        title: string;
-        image: string;
-        description: string;
-    }[];
+  products: {
+    title: string;
+    image: string;
+    description: string;
+  }[];
 }
 
 export default function ProductGallery({ products }: ProductGalleryProps) {
-    const containerRef = useRef<HTMLElement>(null);
-    const trackRef = useRef<HTMLDivElement>(null);
-    const [isMobile, setIsMobile] = useState(
-        typeof window !== 'undefined' ? window.matchMedia('(max-width: 767px)').matches : false
-    );
+  const containerRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const cleanupRef = useRef<(() => void) | null>(null);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 767px)').matches : false
+  );
 
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
 
-        const media = window.matchMedia('(max-width: 767px)');
-        const update = () => setIsMobile(media.matches);
+    const media = window.matchMedia('(max-width: 767px)');
+    const update = () => setIsMobile(media.matches);
 
-        update();
-        media.addEventListener('change', update);
-        return () => media.removeEventListener('change', update);
-    }, []);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
 
-    useGSAP(
-        () => {
-            if (!trackRef.current || !containerRef.current) return;
-            if (isMobile) {
-                gsap.set(trackRef.current, { clearProps: 'transform,willChange' });
-                return;
-            }
+  useEffect(() => {
+    const track = trackRef.current;
+    const container = containerRef.current;
 
-            const track = trackRef.current;
-            const container = containerRef.current;
+    cleanupRef.current?.();
+    cleanupRef.current = null;
 
-            // Calculate how far we need to translate horizontally
-            // It's the full scroll width of the track minus the viewport width
-            const getScrollAmount = () => {
-                const viewportWidth = container.clientWidth || window.innerWidth;
-                return Math.min(0, -(track.scrollWidth - viewportWidth));
-            };
+    if (!track || !container) return;
+    if (isMobile) {
+      track.style.removeProperty('transform');
+      track.style.removeProperty('will-change');
+      return;
+    }
 
-            gsap.set(track, { force3D: true, willChange: 'transform' });
+    let cancelled = false;
 
-            if (getScrollAmount() === 0) return;
+    const setupScrollAnimation = async () => {
+      const gsapModule = await import('gsap');
+      const scrollTriggerModule = await import('gsap/dist/ScrollTrigger');
 
-            // Create a tween that moves the track horizontally
-            const tween = gsap.to(track, {
-                x: getScrollAmount,
-                ease: "none",
-                overwrite: "auto"
-            });
+      if (cancelled) return;
 
-            // Tie this horizontal tween to the vertical scroll of the section
-            const trigger = ScrollTrigger.create({
-                trigger: container,
-                animation: tween,
-                start: "top top",
-                end: () => `+=${getScrollAmount() * -1}`, // Scroll distance equals horizontal distance
-                scrub: 0.45, // Menos latencia visual en el seguimiento
-                pin: true, // Pin the section while we scroll horizontally
-                invalidateOnRefresh: true, // Recalculate on resize
-                anticipatePin: 1,
-                fastScrollEnd: true
-            });
+      const gsap = gsapModule.default;
+      const { ScrollTrigger } = scrollTriggerModule;
+      gsap.registerPlugin(ScrollTrigger);
 
-            return () => {
-                trigger.kill();
-                tween.kill();
-                gsap.set(track, { clearProps: 'willChange' });
-            };
-        },
-        { scope: containerRef, dependencies: [isMobile] }
-    );
+      const getScrollAmount = () => {
+        const viewportWidth = container.clientWidth || window.innerWidth;
+        return Math.min(0, -(track.scrollWidth - viewportWidth));
+      };
 
-    return (
-        <section
-            ref={containerRef}
-            data-header-logo="dark"
-            className="product-gallery-section relative py-10 md:py-20 overflow-hidden z-20 border-t border-bg-300 md:h-screen md:max-h-[900px] flex flex-col justify-center bg-[#e6ccba]"
+      gsap.set(track, { force3D: true, willChange: 'transform' });
+      if (getScrollAmount() === 0) return;
+
+      const tween = gsap.to(track, {
+        x: getScrollAmount,
+        ease: 'none',
+        overwrite: 'auto'
+      });
+
+      const trigger = ScrollTrigger.create({
+        trigger: container,
+        animation: tween,
+        start: 'top top',
+        end: () => `+=${getScrollAmount() * -1}`,
+        scrub: 0.45,
+        pin: true,
+        invalidateOnRefresh: true,
+        anticipatePin: 1,
+        fastScrollEnd: true
+      });
+
+      cleanupRef.current = () => {
+        trigger.kill();
+        tween.kill();
+        gsap.set(track, { clearProps: 'transform,willChange' });
+      };
+    };
+
+    void setupScrollAnimation();
+
+    return () => {
+      cancelled = true;
+      cleanupRef.current?.();
+      cleanupRef.current = null;
+    };
+  }, [isMobile]);
+
+  return (
+    <section
+      ref={containerRef}
+      id="galeria-productos"
+      data-header-logo="dark"
+      className="product-gallery-section relative py-10 md:py-20 overflow-hidden z-20 border-t border-bg-300 md:h-screen md:max-h-[900px] flex flex-col justify-center bg-[#e6ccba]"
+    >
+      <div className="max-w-[1600px] w-full mx-auto px-6 md:px-12 relative z-20 mb-3 md:mb-12 shrink-0">
+        <h2 className="font-condensed font-bold text-[2.35rem] md:text-5xl lg:text-6xl uppercase tracking-[0.01em] text-background-dark">
+          Línea de Parrillas
+        </h2>
+        <p className="mt-2 md:mt-4 text-background-dark/70 max-w-2xl font-medium text-base md:text-lg">
+          Equipos diseñados milímetro a milímetro. Deslizá para conocer las series.
+        </p>
+      </div>
+
+      <div
+        className="product-gallery-touch-scroll w-full relative z-20 overflow-x-auto md:overflow-visible shrink-0 mt-0 md:mt-8 touch-pan-x overscroll-x-contain"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
+        <div
+          ref={trackRef}
+          className="product-track w-max flex gap-4 md:gap-6 px-6 md:px-12 pr-6 md:pr-12 items-end pb-8 transform-gpu snap-x snap-mandatory md:snap-none"
         >
-            <div className="max-w-[1600px] w-full mx-auto px-6 md:px-12 relative z-20 mb-3 md:mb-12 shrink-0">
-                <h2 className="font-condensed font-bold text-[2.35rem] md:text-5xl lg:text-6xl uppercase tracking-[0.01em] text-background-dark">
-                    Línea de Parrillas
-                </h2>
-                <p className="mt-2 md:mt-4 text-background-dark/70 max-w-2xl font-medium text-base md:text-lg">
-                    Equipos diseñados milímetro a milímetro. Deslizá para conocer las series.
-                </p>
-            </div>
-
-            <div
-                className="product-gallery-touch-scroll w-full relative z-20 overflow-x-auto md:overflow-visible shrink-0 mt-0 md:mt-8 touch-pan-x overscroll-x-contain"
-                style={{ WebkitOverflowScrolling: 'touch' }}
+          {products.map((product) => (
+            <article
+              key={product.title}
+              className="product-gallery-card group relative flex flex-col w-[75vw] md:w-[32vw] lg:w-[26vw] xl:w-[23vw] bg-[#f4f2ed] border-[1.5px] border-[#dcd7cd] shadow-sm transition-transform duration-500 ease-out hover:-translate-y-1 shrink-0 snap-start"
             >
-                <div ref={trackRef} className="product-track w-max flex gap-4 md:gap-6 px-6 md:px-12 pr-6 md:pr-12 items-end pb-8 transform-gpu snap-x snap-mandatory md:snap-none">
-                    {products.map((product, i) => (
-                        <article key={i} className="product-gallery-card group relative flex flex-col w-[75vw] md:w-[32vw] lg:w-[26vw] xl:w-[23vw] bg-[#f4f2ed] border-[1.5px] border-[#dcd7cd] shadow-sm transition-transform duration-500 ease-out hover:-translate-y-1 shrink-0 snap-start">
-                            {/* Image Container */}
-                            <div className="flex-1 w-full aspect-[4/5] sm:aspect-square flex items-center justify-center p-6 md:p-10 overflow-hidden">
-                                <Image
-                                    src={product.image}
-                                    alt={product.title}
-                                    width={720}
-                                    height={720}
-                                    quality={72}
-                                    priority={i < 2}
-                                    loading={i < 2 ? 'eager' : 'lazy'}
-                                    sizes="(max-width: 768px) 70vw, (max-width: 1280px) 28vw, 24vw"
-                                    className="w-full h-full object-contain transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-                                />
-                            </div>
+              <div className="flex-1 w-full aspect-[4/5] sm:aspect-square flex items-center justify-center p-6 md:p-10 overflow-hidden">
+                <Image
+                  src={product.image}
+                  alt={product.title}
+                  width={720}
+                  height={720}
+                  quality={70}
+                  loading="lazy"
+                  fetchPriority="low"
+                  sizes="(max-width: 768px) 70vw, (max-width: 1280px) 28vw, 24vw"
+                  className="w-full h-full object-contain transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                />
+              </div>
 
-                            {/* Bottom Button Bar */}
-                            <div className="mx-3 mb-3 md:mx-4 md:mb-4 flex items-stretch border-[1.5px] border-[#181a18] bg-[#f4f2ed] hover:border-primary transition-colors duration-300 cursor-pointer text-[#181a18] hover:text-primary group/btn">
-                                <h3 className="flex-1 font-condensed font-bold text-base md:text-lg uppercase tracking-wide px-3 md:px-4 py-2 md:py-3 flex items-center transition-colors duration-300">
-                                    {product.title}
-                                </h3>
-                                <div className="border-l-[1.5px] border-[#181a18] group-hover/btn:border-primary px-3 md:px-4 py-2 md:py-3 flex items-center justify-center transition-colors duration-300">
-                                    <span className="material-symbols-outlined text-[1.1rem] md:text-[1.2rem] group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5 transition-transform duration-300">north_east</span>
-                                </div>
-                            </div>
-                        </article>
-                    ))}
+              <div className="mx-3 mb-3 md:mx-4 md:mb-4 flex items-stretch border-[1.5px] border-[#181a18] bg-[#f4f2ed] hover:border-primary transition-colors duration-300 cursor-pointer text-[#181a18] hover:text-primary group/btn">
+                <h3 className="flex-1 font-condensed font-bold text-base md:text-lg uppercase tracking-wide px-3 md:px-4 py-2 md:py-3 flex items-center transition-colors duration-300">
+                  {product.title}
+                </h3>
+                <div className="border-l-[1.5px] border-[#181a18] group-hover/btn:border-primary px-3 md:px-4 py-2 md:py-3 flex items-center justify-center transition-colors duration-300">
+                  <Icon
+                    name="north_east"
+                    className="h-[1.1rem] w-[1.1rem] md:h-[1.2rem] md:w-[1.2rem] transition-transform duration-300 group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"
+                  />
                 </div>
-            </div>
-        </section>
-    );
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }

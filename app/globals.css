@@ -30,6 +30,26 @@ body {
   color: var(--text-100);
 }
 
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -3rem;
+  z-index: 120;
+  border: 1px solid var(--bg-300);
+  background: #ece8e0;
+  color: #181a18;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: top 180ms ease-out;
+}
+
+.skip-link:focus {
+  top: 0.75rem;
+}
+
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -301,11 +321,6 @@ textarea:focus-visible {
   will-change: transform, opacity;
   box-shadow: 0 12px 24px rgba(225, 68, 42, 0.38);
   transition: opacity 180ms ease-out;
-}
-
-.project-cursor-follower .material-symbols-outlined {
-  font-size: 1.5rem;
-  line-height: 1;
 }
 
 @media (hover: none), (pointer: coarse) {
@@ -618,7 +633,7 @@ textarea:focus-visible {
   align-items: baseline;
   flex-wrap: nowrap;
   white-space: nowrap;
-  font-family: BeniBold, Beni, sans-serif;
+  font-family: var(--font-beni), var(--font-oswald), sans-serif;
   font-size: clamp(3.2rem, 18vw, 10rem);
   line-height: 0.84;
   letter-spacing: 0.01em;
@@ -651,13 +666,11 @@ textarea:focus-visible {
   pointer-events: none;
 }
 
-.footer-wordmark:hover .footer-letter:not(:hover),
-.footer-wordmark:focus-within .footer-letter:not(:focus-visible) {
+.footer-wordmark:hover .footer-letter:not(:hover) {
   opacity: var(--footer-letter-rest-opacity);
 }
 
-.footer-letter:hover,
-.footer-letter:focus-visible {
+.footer-letter:hover {
   color: transparent;
   background-image: linear-gradient(
     135deg,
@@ -673,10 +686,6 @@ textarea:focus-visible {
     drop-shadow(0 0 var(--footer-letter-glow-blur) rgba(var(--footer-letter-glow-color), calc(var(--footer-letter-glow-strength) + 0.08)))
     drop-shadow(0 0 calc(var(--footer-letter-glow-blur) * 1.65) rgba(var(--footer-letter-glow-color), calc(var(--footer-letter-glow-strength) * 0.62)))
     contrast(1.04);
-}
-
-.footer-letter:focus-visible {
-  text-shadow: 0 0 0.2px currentColor;
 }
 
 .footer-sparks {

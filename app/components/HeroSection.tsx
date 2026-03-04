@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import HeroScrollBackground from './HeroScrollBackground';
+import Icon from './Icon';
 
 type HeroSectionProps = {
   heroGifFrames: string[];
@@ -105,9 +106,10 @@ export default function HeroSection({ heroGifFrames, whatsappUrl, sparks }: Hero
               <Image
                 alt="Parrilla premium en uso"
                 className="w-full h-full object-cover object-[50%_72%] opacity-[0.95]"
-                src="https://images.unsplash.com/photo-1529694157872-4e0c0f3b238b?auto=format&fit=crop&w=1600&q=80"
+                src="/herogif3/herogif3_00000.jpg"
                 fill
                 priority
+                quality={70}
                 sizes="100vw"
               />
             )}
@@ -185,17 +187,16 @@ export default function HeroSection({ heroGifFrames, whatsappUrl, sparks }: Hero
                   <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="btn-solid-system on-dark group">
                     <span className="btn-text">Iniciar proyecto</span>
                     <span className="btn-icon">
-                      <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">
-                        north_east
-                      </span>
+                      <Icon
+                        name="north_east"
+                        className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1"
+                      />
                     </span>
                   </a>
                   <a href="#modelos" className="hidden sm:inline-flex btn-solid-system on-light group hero-cta-compact">
                     <span className="btn-text">Ver modelos</span>
                     <span className="btn-icon">
-                      <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">
-                        arrow_forward
-                      </span>
+                      <Icon name="arrow_forward" className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
                     </span>
                   </a>
                 </div>

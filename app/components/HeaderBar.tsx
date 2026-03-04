@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import AstilleroLogo from './AstilleroLogo';
+import Icon from './Icon';
 
 const navLinks = [
   { href: '#modelos', label: 'Modelos' },
@@ -138,7 +139,11 @@ export default function HeaderBar() {
               isMenuOpen ? 'opacity-100 translate-x-0 pointer-events-auto' : 'opacity-0 translate-x-12 pointer-events-none'
             }`}
           >
-            <nav id="main-menu-nav-desktop" className="flex h-full border border-[#2a2a2a] bg-[#ece9e3] text-[#1f1f1f] whitespace-nowrap">
+            <nav
+              id="main-menu-nav-desktop"
+              aria-label="Menú principal"
+              className="flex h-full border border-[#2a2a2a] bg-[#ece9e3] text-[#1f1f1f] whitespace-nowrap"
+            >
               {navLinks.map((link) => (
                 <a
                   key={link.href}
@@ -172,9 +177,12 @@ export default function HeaderBar() {
                 <span className="block h-[2px] w-6 bg-current" />
               </span>
               {/* Close (X) Icon */}
-              <span aria-hidden="true" className={`absolute material-symbols-outlined text-[1.2rem] transition-all duration-300 ${isMenuOpen ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-50 -rotate-90'}`}>
-                close
-              </span>
+              <Icon
+                name="close"
+                className={`absolute h-5 w-5 transition-all duration-300 ${
+                  isMenuOpen ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-50 -rotate-90'
+                }`}
+              />
             </span>
             <span>Menu</span>
           </button>
@@ -206,20 +214,19 @@ export default function HeaderBar() {
                 <span className="block h-[2px] w-6 bg-current" />
                 <span className="block h-[2px] w-4 bg-current" />
               </span>
-              <span
-                aria-hidden="true"
-                className={`absolute material-symbols-outlined text-[1.05rem] transition-all duration-300 ${
+              <Icon
+                name="close"
+                className={`absolute h-[1.05rem] w-[1.05rem] transition-all duration-300 ${
                   isMenuOpen ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-50 -rotate-90'
                 }`}
-              >
-                close
-              </span>
+              />
             </span>
             <span>Menu</span>
           </button>
 
           <nav
             id="main-menu-nav-mobile"
+            aria-label="Menú principal móvil"
             className={`absolute right-0 mt-2 min-w-[190px] border border-[#2a2a2a] bg-[#ece9e3] text-[#1f1f1f] transition-all duration-300 ease-out ${
               isMenuOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'
             }`}

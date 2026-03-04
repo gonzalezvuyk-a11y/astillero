@@ -3,6 +3,7 @@
 import type { MouseEvent } from 'react';
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
+import Icon from './Icon';
 
 type ProjectsRealGridProps = {
   images: string[];
@@ -95,6 +96,7 @@ export default function ProjectsRealGrid({ images, profileUrl }: ProjectsRealGri
               alt={`Proyecto real ${index + 1}`}
               width={1200}
               height={1500}
+              quality={65}
               sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
               className="w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
               style={{ aspectRatio: '4 / 5' }}
@@ -104,7 +106,7 @@ export default function ProjectsRealGrid({ images, profileUrl }: ProjectsRealGri
       </div>
 
       <div ref={cursorRef} className="project-cursor-follower" aria-hidden="true">
-        <span className="material-symbols-outlined">north_east</span>
+        <Icon name="north_east" className="h-6 w-6" />
       </div>
     </>
   );

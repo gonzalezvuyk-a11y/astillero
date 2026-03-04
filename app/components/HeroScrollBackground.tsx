@@ -13,6 +13,8 @@ type HeroScrollBackgroundProps = {
   onProgress?: (progress: number) => void;
 };
 
+const EAGER_FRAME_COUNT = 6;
+
 export default function HeroScrollBackground({
   frames,
   sectionId,
@@ -31,9 +33,11 @@ export default function HeroScrollBackground({
   const currentProgressRef = useRef(0);
   const mountedRef = useRef(false);
   const introZoomRef = useRef(introZoomStart);
+  const scheduleRenderRef = useRef<() => void>(() => undefined);
 
   useEffect(() => {
     introZoomRef.current = introZoomStart;
+    scheduleRenderRef.current();
   }, [introZoomStart]);
 
   const safeFrames = useMemo(() => (frames.length > 0 ? frames : []), [frames]);
@@ -42,40 +46,80 @@ export default function HeroScrollBackground({
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
-      cancelAnimationFrame(rafRef.current);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = 0;
+      }
       if (scrollRafRef.current !== null) {
         cancelAnimationFrame(scrollRafRef.current);
+        scrollRafRef.current = null;
       }
+      scheduleRenderRef.current = () => undefined;
     };
   }, []);
 
   useEffect(() => {
     if (safeFrames.length === 0) return;
+
     let cancelled = false;
+    let idleId: number | null = null;
+    let fallbackTimer: ReturnType<typeof setTimeout> | null = null;
+
     loadedFramesRef.current = new Array(safeFrames.length);
 
     const loadFrame = (src: string, index: number, priority: 'high' | 'low') =>
       new Promise<void>((resolve) => {
         const img = new Image();
         img.decoding = 'async';
-        img.loading = 'eager';
+        img.loading = priority === 'high' ? 'eager' : 'lazy';
         if ('fetchPriority' in img) {
           (img as HTMLImageElement & { fetchPriority?: 'high' | 'low' }).fetchPriority = priority;
         }
         img.src = src;
         img.onload = () => {
-          if (!cancelled) loadedFramesRef.current[index] = img;
+          if (!cancelled) {
+            loadedFramesRef.current[index] = img;
+            scheduleRenderRef.current();
+          }
           resolve();
         };
         img.onerror = () => resolve();
       });
 
-    safeFrames.forEach((src, index) => {
-      void loadFrame(src, index, index < 2 ? 'high' : 'low');
-    });
+    const eagerCount = Math.min(EAGER_FRAME_COUNT, safeFrames.length);
+    for (let index = 0; index < eagerCount; index += 1) {
+      void loadFrame(safeFrames[index], index, 'high');
+    }
+
+    const loadRemainingFrames = async () => {
+      for (let index = eagerCount; index < safeFrames.length && !cancelled; index += 1) {
+        await loadFrame(safeFrames[index], index, 'low');
+      }
+    };
+
+    if (safeFrames.length > eagerCount) {
+      if ('requestIdleCallback' in window) {
+        idleId = window.requestIdleCallback(
+          () => {
+            void loadRemainingFrames();
+          },
+          { timeout: 1200 }
+        );
+      } else {
+        fallbackTimer = setTimeout(() => {
+          void loadRemainingFrames();
+        }, 350);
+      }
+    }
 
     return () => {
       cancelled = true;
+      if (idleId !== null && 'cancelIdleCallback' in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (fallbackTimer !== null) {
+        clearTimeout(fallbackTimer);
+      }
       loadedFramesRef.current = [];
     };
   }, [safeFrames]);
@@ -88,25 +132,26 @@ export default function HeroScrollBackground({
     const updateTargetProgress = () => {
       const rect = section.getBoundingClientRect();
       const scrollableDistance = Math.max(section.offsetHeight - window.innerHeight, 1);
-      const raw = Math.min(Math.max(-rect.top / scrollableDistance, 0), 1);
-      targetProgressRef.current = raw;
+      targetProgressRef.current = Math.min(Math.max(-rect.top / scrollableDistance, 0), 1);
     };
 
-    const onScroll = () => {
+    const onViewportChange = () => {
       if (scrollRafRef.current !== null) return;
       scrollRafRef.current = requestAnimationFrame(() => {
         scrollRafRef.current = null;
         updateTargetProgress();
+        scheduleRenderRef.current();
       });
     };
 
     updateTargetProgress();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    scheduleRenderRef.current();
+    window.addEventListener('scroll', onViewportChange, { passive: true });
+    window.addEventListener('resize', onViewportChange, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('scroll', onViewportChange);
+      window.removeEventListener('resize', onViewportChange);
       if (scrollRafRef.current !== null) {
         cancelAnimationFrame(scrollRafRef.current);
         scrollRafRef.current = null;
@@ -136,13 +181,13 @@ export default function HeroScrollBackground({
 
         return null;
       };
+
       const frame = getClosestLoadedFrame();
-      if (!frame) return;
+      if (!frame) return false;
 
       const viewportWidth = canvas.clientWidth;
       const viewportHeight = canvas.clientHeight;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
       const targetWidth = Math.floor(viewportWidth * dpr);
       const targetHeight = Math.floor(viewportHeight * dpr);
 
@@ -159,7 +204,6 @@ export default function HeroScrollBackground({
           ? Math.min(viewportWidth / frame.naturalWidth, viewportHeight / frame.naturalHeight)
           : Math.max(viewportWidth / frame.naturalWidth, viewportHeight / frame.naturalHeight);
 
-      // Interpolate intro zoom down to 1
       introZoomRef.current = introZoomRef.current + (1 - introZoomRef.current) * 0.05;
       const currentZoom = zoom * introZoomRef.current;
 
@@ -171,15 +215,16 @@ export default function HeroScrollBackground({
       context.imageSmoothingEnabled = true;
       context.imageSmoothingQuality = 'high';
       context.drawImage(frame, drawX, drawY, drawWidth, drawHeight);
+      return true;
     };
 
-    const loop = () => {
+    const render = () => {
       if (!mountedRef.current) return;
 
-      // Apple-like smooth progress interpolation.
+      rafRef.current = 0;
+
       const target = targetProgressRef.current;
       let current = currentProgressRef.current + (target - currentProgressRef.current) * 0.15;
-      // Snap near the end so the last frame is reached before the overlap section rises.
       if (target >= 0.995) {
         current = 1;
       }
@@ -189,13 +234,31 @@ export default function HeroScrollBackground({
       const maxIndex = Math.max(safeFrames.length - 1, 0);
       const sequenceProgress = Math.min(1, current * 1.5);
       const frameIndex = Math.min(maxIndex, Math.max(0, Math.floor(sequenceProgress * maxIndex)));
-      drawFrame(frameIndex);
+      const didDraw = drawFrame(frameIndex);
 
-      rafRef.current = requestAnimationFrame(loop);
+      const progressSettled = Math.abs(target - current) <= 0.001;
+      const introSettled = introZoomRef.current <= 1.01;
+
+      if (!didDraw || !progressSettled || !introSettled) {
+        scheduleRenderRef.current();
+      }
     };
 
-    rafRef.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(rafRef.current);
+    const scheduleRender = () => {
+      if (!mountedRef.current || rafRef.current) return;
+      rafRef.current = requestAnimationFrame(render);
+    };
+
+    scheduleRenderRef.current = scheduleRender;
+    scheduleRender();
+
+    return () => {
+      scheduleRenderRef.current = () => undefined;
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = 0;
+      }
+    };
   }, [safeFrames, zoom, anchorY, fit, onProgress]);
 
   if (safeFrames.length === 0) return null;

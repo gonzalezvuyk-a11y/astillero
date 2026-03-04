@@ -10,6 +10,7 @@ import DetailExplorer from './components/DetailExplorer';
 import ProjectsRealGrid from './components/ProjectsRealGrid';
 import ProcessTimeline, { type ProcessStep } from './components/ProcessTimeline';
 import FooterPremiumEffects from './components/FooterPremiumEffects';
+import Icon from './components/Icon';
 
 const whatsappMessage =
   'Hola, quiero cotizar una parrilla El Astillero. Tipo: ____. Medidas aprox: __ x __. Ciudad: ____. Tengo foto/plano: sí/no.';
@@ -231,7 +232,11 @@ const footerEmbers = Array.from({ length: FOOTER_EMBER_COUNT }).map(() => ({
 
 export default function Home() {
   return (
-    <main className="bg-background-dark text-text-100 font-sans antialiased selection:bg-primary selection:text-text-100">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="bg-background-dark text-text-100 font-sans antialiased selection:bg-primary selection:text-text-100"
+    >
       <ScrollReveal />
       <div className="noise-overlay" />
       <div className="fixed inset-0 w-full h-full pointer-events-none z-0">
@@ -331,7 +336,7 @@ export default function Home() {
                     >
                       <span className="px-4 py-3">{card.cta}</span>
                       <span className="border-l border-bg-300 px-3 py-3">
-                        <span className="material-symbols-outlined text-[1rem] leading-none">north_east</span>
+                        <Icon name="north_east" className="h-4 w-4" />
                       </span>
                     </a>
                   </div>
@@ -387,7 +392,7 @@ export default function Home() {
                     >
                       <span className="px-4 py-3">{card.cta}</span>
                       <span className="border-l border-bg-300 px-3 py-3">
-                        <span className="material-symbols-outlined text-[1rem] leading-none">north_east</span>
+                        <Icon name="north_east" className="h-4 w-4" />
                       </span>
                     </a>
                   </div>
@@ -446,16 +451,17 @@ export default function Home() {
               href={instagramProfileUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-solid-system on-dark group hero-cta-compact font-sans"
-            >
-              <span className="btn-text">Ver más trabajos en Instagram</span>
-              <span className="btn-icon">
-                <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">
-                  north_east
+                className="btn-solid-system on-dark group hero-cta-compact font-sans"
+              >
+                <span className="btn-text">Ver más trabajos en Instagram</span>
+                <span className="btn-icon">
+                  <Icon
+                    name="north_east"
+                    className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1"
+                  />
                 </span>
-              </span>
-            </a>
-          </div>
+              </a>
+            </div>
         </div>
       </section>
 
@@ -477,15 +483,15 @@ export default function Home() {
 
               <div className="mt-10 space-y-4 text-bg-200">
                 <p className="flex items-center gap-3 text-lg">
-                  <span className="material-symbols-outlined text-primary">local_shipping</span>
+                  <Icon name="local_shipping" className="h-5 w-5 text-primary" />
                   Cobertura en todo el país
                 </p>
                 <p className="flex items-center gap-3 text-lg">
-                  <span className="material-symbols-outlined text-primary">verified</span>
+                  <Icon name="verified" className="h-5 w-5 text-primary" />
                   Garantía extendida
                 </p>
                 <p className="flex items-center gap-3 text-lg">
-                  <span className="material-symbols-outlined text-primary">construction</span>
+                  <Icon name="construction" className="h-5 w-5 text-primary" />
                   Instalación especializada
                 </p>
               </div>
@@ -539,9 +545,10 @@ export default function Home() {
                     Iniciar consulta
                   </span>
                   <div className="border-l-[1.5px] border-bone/20 px-4 py-4 flex items-center justify-center transition-colors duration-300">
-                    <span className="material-symbols-outlined text-[1.2rem] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform duration-300">
-                      north_east
-                    </span>
+                    <Icon
+                      name="north_east"
+                      className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                    />
                   </div>
                 </a>
               </form>

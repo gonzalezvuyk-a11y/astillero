@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
+import Icon from './Icon';
 
 export type DetailItem = {
   id: string;
@@ -65,7 +66,9 @@ export default function DetailExplorer({ details, whatsappUrl }: DetailExplorerP
           className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-200 ease-out ${
             detail.id === activeDetail?.id ? 'z-10 opacity-100' : 'pointer-events-none z-0 opacity-0'
           }`}
-          priority={index === 0}
+          loading={index === 0 ? 'eager' : 'lazy'}
+          fetchPriority={index === 0 ? 'high' : 'low'}
+          quality={68}
           onLoad={() => markLoaded(detail.id)}
           onError={() => markFailed(detail.id)}
         />
@@ -98,9 +101,10 @@ export default function DetailExplorer({ details, whatsappUrl }: DetailExplorerP
           Personalizá tu parrilla
         </span>
         <div className="flex items-center justify-center border-l-[1.5px] border-[#181a18] px-4 py-3 transition-colors duration-300">
-          <span className="material-symbols-outlined text-[1.2rem] transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
-            north_east
-          </span>
+          <Icon
+            name="north_east"
+            className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+          />
         </div>
       </a>
     </div>
@@ -205,7 +209,9 @@ export default function DetailExplorer({ details, whatsappUrl }: DetailExplorerP
                     className={`absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                       isActive ? 'scale-100' : 'scale-[1.04]'
                     }`}
-                    priority={index === 0}
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    fetchPriority={index === 0 ? 'high' : 'low'}
+                    quality={68}
                     onLoad={() => markLoaded(detail.id)}
                     onError={() => markFailed(detail.id)}
                   />
