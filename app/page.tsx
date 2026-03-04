@@ -215,7 +215,7 @@ function getProjectGridImages() {
 
 const projectGridImages = getProjectGridImages();
 
-const heroSparks = Array.from({ length: 18 }).map((_, i) => ({
+const heroSparks = Array.from({ length: 18 }).map(() => ({
   left: `${Math.random() * 100}%`,
   delay: `${(Math.random() * 3).toFixed(1)}s`,
   duration: `${(Math.random() * 2 + 4).toFixed(1)}s`,

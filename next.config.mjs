@@ -1,4 +1,8 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 const isProd = process.env.NODE_ENV === 'production';
+const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
 const securityHeaders = [
   {
@@ -68,6 +72,7 @@ const securityHeaders = [
 const nextConfig = {
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
+  outputFileTracingRoot: rootDir,
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
