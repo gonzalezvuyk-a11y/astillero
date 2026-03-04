@@ -156,18 +156,11 @@ export default function HeroSection({ heroGifFrames, whatsappUrl, sparks }: Hero
                 </div>
                 <div
                   ref={ctaRowRef}
-                  className="mt-8 flex w-full flex-wrap gap-4 md:justify-end"
-                  data-reveal="up"
-                  data-reveal-delay="240"
-                  style={{
-                    willChange: 'opacity, transform',
-                    transformOrigin: 'left center',
-                    opacity: 0,
-                    transform: 'translate3d(0, 12px, 0) scale(0.98)'
-                  }}
+                  className="mt-12 flex w-full flex-wrap gap-4 justify-start"
+                  style={{ willChange: 'opacity, transform', opacity: 0, transform: 'translate3d(0, 12px, 0)' }}
                 >
-                  <a href={whatsappUrl} target="_blank" rel="noreferrer" className="btn-solid-system on-dark group hero-cta-compact">
-                    <span className="btn-text">Cotizar por WhatsApp</span>
+                  <a href={whatsappUrl} target="_blank" rel="noreferrer" className="btn-solid-system on-dark group">
+                    <span className="btn-text">Iniciar proyecto</span>
                     <span className="btn-icon">
                       <span className="material-symbols-outlined group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300">
                         north_east

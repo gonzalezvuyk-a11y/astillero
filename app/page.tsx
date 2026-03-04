@@ -96,13 +96,13 @@ function getProductCarouselImages() {
 const productCarouselImages = getProductCarouselImages();
 
 function getHeroGifFrames() {
-  const heroDir = path.join(process.cwd(), 'public', 'herogif2');
+  const heroDir = path.join(process.cwd(), 'public', 'herogif3');
   if (!existsSync(heroDir)) return [];
 
   return readdirSync(heroDir)
     .filter((file) => allImageExtensions.has(path.extname(file).toLowerCase()))
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
-    .map((file) => `/herogif2/${encodeURIComponent(file)}`);
+    .map((file) => `/herogif3/${encodeURIComponent(file)}`);
 }
 
 const heroGifFrames = getHeroGifFrames();
@@ -201,12 +201,12 @@ export default async function Home() {
       <HeroSection heroGifFrames={heroGifFrames} whatsappUrl={whatsappUrl} sparks={footerSparks} />
 
       <section
-        className="next-section-overlap -mt-[100vh] py-28 bg-bg-200 relative z-20"
+        className="next-section-overlap -mt-[100vh] py-28 bg-[#ece8e0] relative z-20"
         data-reveal="up"
       >
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
           {/* Horizontal Band layout for benefits (no boarders, fine dividers) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-bg-300">
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#c9c4ba]">
             {benefits.map((benefit, index) => (
               <article
                 key={benefit.title}
@@ -215,12 +215,12 @@ export default async function Home() {
                 data-reveal-delay={String(index * 150)}
               >
                 <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
-                  <span className="w-8 h-[1px] bg-primary opacity-60 group-hover:w-12 transition-all duration-500 ease-out" />
-                  <h2 className="font-condensed font-bold text-lg md:text-xl text-text-100 uppercase tracking-[0.05em] transition-colors duration-300">
+                  <span className="w-8 h-[1.5px] bg-[#df572e] opacity-80 group-hover:w-12 transition-all duration-500 ease-out" />
+                  <h2 className="font-condensed font-bold text-lg md:text-xl text-[#181a18] uppercase tracking-[0.05em] transition-colors duration-300">
                     {benefit.title}
                   </h2>
                 </div>
-                <p className="text-text-200 font-medium text-sm md:text-base leading-relaxed tracking-wide">
+                <p className="text-[#3b3a37] font-medium text-sm md:text-base leading-relaxed tracking-wide">
                   {benefit.text}
                 </p>
               </article>
